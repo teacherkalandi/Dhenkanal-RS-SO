@@ -1,0 +1,107 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- GLOBAL SAFETY NET ---
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- GLOBAL HELPERS ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      // Bootstrapped admin email check for production safety
+      return isEmailVerified() && request.auth.token.email == 'teacherkalandi@gmail.com';
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- ENTITY VALIDATION HELPERS ---
+
+    function isValidNews(data) {
+      return data.content is string && data.content.size() <= 1000
+          && data.createdAt is timestamp;
+    }
+
+    function isValidDocument(data) {
+      return data.title is string && data.title.size() <= 200
+          && data.category is string && data.category.size() <= 100
+          && data.subCategory is string && data.subCategory.size() <= 100
+          && (data.get('description', '') is string && data.get('description', '').size() <= 1000)
+          && (data.get('fileUrl', '') is string && data.get('fileUrl', '').size() <= 500)
+          && (data.get('externalLink', '') is string && data.get('externalLink', '').size() <= 500)
+          && data.createdAt is timestamp;
+    }
+
+    function isValidRequest(data) {
+      return data.name is string && data.name.size() <= 100
+          && data.address is string && data.address.size() <= 500
+          && data.mobile is string && data.mobile.size() <= 15
+          && data.submittedAt is timestamp;
+    }
+
+    // --- COLLECTION RULES ---
+
+    // Public Collections (Read only for public, write for admin)
+    match /news/{newsId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidNews(incoming()) && isValidId(newsId);
+      allow update: if isAdmin() && isValidNews(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /documents/{docId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidDocument(incoming()) && isValidId(docId);
+      allow update: if isAdmin() && isValidDocument(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Service Request Collections (Public Create, Admin Read/Delete)
+    match /gangajal_orders/{orderId} {
+      allow read: if isAdmin();
+      allow create: if isValidId(orderId) && isValidRequest(incoming()) && incoming().quantity is number;
+      allow delete: if isAdmin();
+    }
+
+    match /aadhaar_bookings/{bookingId} {
+      allow read: if isAdmin();
+      allow create: if isValidId(bookingId) && isValidRequest(incoming()) && incoming().bookingDate is string;
+      allow delete: if isAdmin();
+    }
+
+    // Generic Requests
+    match /{collection}/{requestId} {
+      allow read: if isAdmin();
+      allow create: if collection in [
+        'passport_requests', 'article_booking_requests', 'track_article_requests',
+        'account_opening_requests', 'plirpli_requests', 'other_help_requests'
+      ] && isValidId(requestId) && isValidRequest(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /site_stats/{statId} {
+      allow read: if true;
+      allow update: if statId == 'visitors' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count']);
+      allow create: if isAdmin() && statId == 'visitors';
+    }
+  }
+}

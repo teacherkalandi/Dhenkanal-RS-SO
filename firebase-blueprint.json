@@ -1,0 +1,104 @@
+{
+  "entities": {
+    "Document": {
+      "title": "Postal Document",
+      "description": "Metadata for uploaded documents or external links",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "subCategory": { "type": "string" },
+        "description": { "type": "string" },
+        "fileUrl": { "type": "string" },
+        "fileId": { "type": "string" },
+        "externalLink": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "authorUid": { "type": "string" }
+      },
+      "required": ["title", "category", "subCategory", "createdAt"]
+    },
+    "News": {
+      "title": "Latest News",
+      "description": "News items for the scrolling marquee",
+      "type": "object",
+      "properties": {
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["content", "createdAt"]
+    },
+    "GangajalOrder": {
+      "title": "Gangajal Order",
+      "description": "Orders for Gangajal delivery",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "mobile": { "type": "string" },
+        "quantity": { "type": "number" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "address", "mobile", "quantity", "submittedAt"]
+    },
+    "AadhaarBooking": {
+      "title": "Aadhaar Booking",
+      "description": "Bookings for Aadhaar services",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "mobile": { "type": "string" },
+        "bookingDate": { "type": "string", "format": "date" },
+        "officeName": { "type": "string" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "address", "mobile", "bookingDate", "officeName", "submittedAt"]
+    },
+    "ServiceRequest": {
+      "title": "General Service Request",
+      "description": "Requests for other postal services",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "mobile": { "type": "string" },
+        "message": { "type": "string" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "address", "mobile", "submittedAt"]
+    }
+  },
+  "firestore": {
+    "/documents/{docId}": {
+      "schema": "Document",
+      "description": "Collection of postal documents"
+    },
+    "/news/{newsId}": {
+      "schema": "News",
+      "description": "Collection of latest news items"
+    },
+    "/gangajal_orders/{orderId}": {
+      "schema": "GangajalOrder",
+      "description": "Collection of Gangajal orders"
+    },
+    "/aadhaar_bookings/{bookingId}": {
+      "schema": "AadhaarBooking",
+      "description": "Collection of Aadhaar bookings"
+    },
+    "/passport_requests/{requestId}": { "schema": "ServiceRequest", "description": "Passport service requests" },
+    "/article_booking_requests/{requestId}": { "schema": "ServiceRequest", "description": "Article booking requests" },
+    "/track_article_requests/{requestId}": { "schema": "ServiceRequest", "description": "Track article requests" },
+    "/account_opening_requests/{requestId}": { "schema": "ServiceRequest", "description": "Account opening requests" },
+    "/plirpli_requests/{requestId}": { "schema": "ServiceRequest", "description": "PLI/RPLI service requests" },
+    "/other_help_requests/{requestId}": { "schema": "ServiceRequest", "description": "Other help requests" },
+    "/site_stats/{statId}": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "number" }
+        }
+      },
+      "description": "General site statistics like visitor counts"
+    }
+  }
+}
