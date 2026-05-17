@@ -10,7 +10,6 @@ const SERVICES = [
   { id: 'aadhaar', name: 'Aadhaar Enrollment', icon: Fingerprint, collection: 'aadhaar_bookings' },
   { id: 'passport', name: 'Passport Services', icon: BookOpen, collection: 'passport_requests' },
   { id: 'article', name: 'Booking of Articles', icon: Mail, collection: 'article_booking_requests' },
-  { id: 'track', name: 'Track Your Articles', icon: Search, collection: 'track_article_requests' },
   { id: 'account', name: 'Account Opening', icon: PiggyBank, collection: 'account_opening_requests' },
   { id: 'pli', name: 'PLI/RPLI Services', icon: Shield, collection: 'plirpli_requests' },
   { id: 'other', name: 'Any Other Help', icon: HelpCircle, collection: 'other_help_requests' },
@@ -41,7 +40,7 @@ export default function ServiceRequest({ hideHeader = false }: { hideHeader?: bo
         payload.bookingDate = formData.bookingDate;
         payload.officeName = 'Dhenkanal RS SO';
       }
-      if (['passport', 'article', 'track', 'account', 'pli', 'other'].includes(selectedService.id)) {
+      if (['passport', 'article', 'account', 'pli', 'other'].includes(selectedService.id)) {
         payload.message = formData.message;
       }
 
