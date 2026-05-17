@@ -23,7 +23,7 @@ const OTHERS_LINKS = [
   { name: 'Office Directory', url: 'https://office-directory.vercel.app/' },
   { name: 'Circulars', url: 'https://circulars.vercel.app/' },
   { name: 'Staff Site', url: 'https://staffsite-dklrs.vercel.app/' },
-  { name: 'Dhenkanal RS SO Site', url: 'https://sites.google.com/view/dhenkanalrsso/home' },
+  { name: 'Dhenkanal RS SO Site', url: 'https://sites.google.com/view/dhenkanalrsso/home?authuser=3' },
   { name: 'Forms and Downloads', url: 'https://indiapost-repository.vercel.app/' },
 ];
 
