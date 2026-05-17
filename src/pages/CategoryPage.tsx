@@ -82,6 +82,23 @@ export default function CategoryPage() {
     return acc;
   }, {} as any);
 
+  const getTheme = (subCat: string) => {
+    const themes = [
+      { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100', icon: 'text-blue-500', btn: 'bg-blue-600 hover:bg-blue-700', badge: 'bg-blue-100 text-blue-700', hover: 'hover:border-blue-300' },
+      { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', icon: 'text-emerald-500', btn: 'bg-emerald-600 hover:bg-emerald-700', badge: 'bg-emerald-100 text-emerald-700', hover: 'hover:border-emerald-300' },
+      { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', icon: 'text-amber-500', btn: 'bg-amber-600 hover:bg-amber-700', badge: 'bg-amber-100 text-amber-700', hover: 'hover:border-amber-300' },
+      { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-100', icon: 'text-purple-500', btn: 'bg-purple-600 hover:bg-purple-700', badge: 'bg-purple-100 text-purple-700', hover: 'hover:border-purple-300' },
+      { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-100', icon: 'text-rose-500', btn: 'bg-rose-600 hover:bg-rose-700', badge: 'bg-rose-100 text-rose-700', hover: 'hover:border-rose-300' },
+      { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-100', icon: 'text-indigo-500', btn: 'bg-indigo-600 hover:bg-indigo-700', badge: 'bg-indigo-100 text-indigo-700', hover: 'hover:border-indigo-300' },
+      { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-100', icon: 'text-cyan-500', btn: 'bg-cyan-600 hover:bg-cyan-700', badge: 'bg-cyan-100 text-cyan-700', hover: 'hover:border-cyan-300' },
+    ];
+    let hash = 0;
+    for (let i = 0; i < subCat.length; i++) {
+      hash = subCat.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return themes[Math.abs(hash) % themes.length];
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Category Header */}
@@ -169,105 +186,110 @@ export default function CategoryPage() {
                 </p>
               </div>
             ) : (
-              (Object.entries(groupedDocs) as any).map(([subCat, docs]: [string, any]) => (
-                <div key={subCat} className="mb-8 md:mb-12 last:mb-0">
-                  <div className="flex items-center gap-3 mb-4 md:mb-6 bg-gray-50 p-2 md:p-3 rounded-xl md:rounded-2xl w-fit">
-                    <Filter size={14} className="text-[#D8232A]" />
-                    <h3 className="font-black text-[#D8232A] text-[10px] md:text-xs uppercase tracking-widest">
-                      {subCat}
-                    </h3>
-                    <span className="bg-red-100 text-[#D8232A] px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-bold">
-                      {docs.length}
-                    </span>
-                  </div>
+              (Object.entries(groupedDocs) as any).map(([subCat, docs]: [string, any]) => {
+                const theme = getTheme(subCat);
+                return (
+                  <div key={subCat} className="mb-8 md:mb-12 last:mb-0">
+                    <div className={cn("flex items-center gap-3 mb-4 md:mb-6 p-2 md:p-3 rounded-xl md:rounded-2xl w-fit", theme.bg)}>
+                      <Filter size={14} className={theme.text} />
+                      <h3 className={cn("font-black text-[10px] md:text-xs uppercase tracking-widest", theme.text)}>
+                        {subCat}
+                      </h3>
+                      <span className={cn("px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-bold", theme.badge)}>
+                        {docs.length}
+                      </span>
+                    </div>
 
-                  <div
-                    className={cn(
-                      "gap-4 md:gap-6",
-                      viewMode === "grid"
-                        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-                        : "flex flex-col",
-                    )}
-                  >
-                    {docs.map((doc) => (
-                      <motion.div
-                        layout
-                        key={doc.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className={cn(
-                          "bg-white border border-gray-100 rounded-3xl p-5 md:p-6 transition-all hover:shadow-xl hover:border-red-100 group",
-                          viewMode === "list" &&
-                            "md:flex md:items-center md:justify-between",
-                        )}
-                      >
-                        <div
+                    <div
+                      className={cn(
+                        "gap-4 md:gap-6",
+                        viewMode === "grid"
+                          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                          : "flex flex-col",
+                      )}
+                    >
+                      {docs.map((doc: any) => (
+                        <motion.div
+                          layout
+                          key={doc.id}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
                           className={cn(
-                            "space-y-4",
+                            "bg-white border rounded-3xl p-5 md:p-6 transition-all hover:shadow-xl group",
+                            theme.border,
+                            theme.hover,
                             viewMode === "list" &&
-                              "md:flex-1 md:flex md:items-center md:gap-6 md:space-y-0",
+                              "md:flex md:items-center md:justify-between",
                           )}
                         >
-                          <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-xl md:rounded-2xl flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-[#D8232A] transition-colors shrink-0">
-                            <FileText size={20} md:size={24} />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-bold text-gray-800 text-sm md:text-lg mb-1 leading-tight">
-                              {doc.title}
-                            </h4>
-                            <p className="text-[10px] md:text-xs text-gray-500 line-clamp-2 leading-relaxed mb-3">
-                              {doc.description}
-                            </p>
-                            <div className="flex items-center gap-3 md:gap-4 text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                              <div className="flex items-center gap-1">
-                                <Calendar size={10} md:size={12} />
-                                {formatDate(
-                                  doc.createdAt?.toDate
-                                    ? doc.createdAt.toDate()
-                                    : doc.createdAt,
+                          <div
+                            className={cn(
+                              "space-y-4",
+                              viewMode === "list" &&
+                                "md:flex-1 md:flex md:items-center md:gap-6 md:space-y-0",
+                            )}
+                          >
+                            <div className={cn("w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-xl md:rounded-2xl flex items-center justify-center text-gray-400 transition-colors shrink-0", "group-hover:"+theme.bg, "group-hover:"+theme.text)}>
+                              <FileText size={20} md:size={24} />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-gray-800 text-sm md:text-lg mb-1 leading-tight">
+                                {doc.title}
+                              </h4>
+                              <p className="text-[10px] md:text-xs text-gray-500 line-clamp-2 leading-relaxed mb-3">
+                                {doc.description}
+                              </p>
+                              <div className="flex items-center gap-3 md:gap-4 text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                <div className="flex items-center gap-1">
+                                  <Calendar size={10} md:size={12} />
+                                  {formatDate(
+                                    doc.createdAt?.toDate
+                                      ? doc.createdAt.toDate()
+                                      : doc.createdAt,
+                                  )}
+                                </div>
+                                {doc.fileUrl && (
+                                  <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase">
+                                    Download
+                                  </span>
                                 )}
                               </div>
-                              {doc.fileUrl && (
-                                <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase">
-                                  Download
-                                </span>
-                              )}
                             </div>
                           </div>
-                        </div>
 
-                        <div
-                          className={cn(
-                            "mt-5 md:mt-6 pt-5 md:pt-6 border-t md:border-t-0 flex gap-2 md:gap-3",
-                            viewMode === "list" && "md:mt-0 md:pt-0 md:min-w-[280px]",
-                          )}
-                        >
-                          {doc.fileUrl && (
-                            <a
-                              href={doc.fileUrl}
-                              className="flex-1 bg-[#D8232A] text-white py-2.5 md:py-3 rounded-xl font-bold text-[10px] md:text-xs flex items-center justify-center gap-2 hover:bg-[#8B0000] transition-colors shadow-lg shadow-red-500/10"
-                            >
-                              <Download size={14} />
-                              Download
-                            </a>
-                          )}
-                          {doc.externalLink && (
-                            <a
-                              href={doc.externalLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 bg-white border-2 border-slate-100 text-slate-700 py-2.5 md:py-3 rounded-xl font-bold text-[10px] md:text-xs flex items-center justify-center gap-2 hover:border-[#D8232A] hover:text-[#D8232A] transition-all"
-                            >
-                              <ExternalLink size={14} />
-                              View Official
-                            </a>
-                          )}
-                        </div>
-                      </motion.div>
-                    ))}
+                          <div
+                            className={cn(
+                              "mt-5 md:mt-6 pt-5 md:pt-6 border-t md:border-t-0 flex gap-2 md:gap-3",
+                              viewMode === "list" && "md:mt-0 md:pt-0 md:min-w-[280px]",
+                            )}
+                          >
+                            {doc.fileUrl && (
+                              <a
+                                href={doc.fileUrl}
+                                className={cn("flex-1 text-white py-2.5 md:py-3 rounded-xl font-bold text-[10px] md:text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-black/5", theme.btn)}
+                              >
+                                <Download size={14} />
+                                Download
+                              </a>
+                            )}
+                            {doc.externalLink && (
+                              <a
+                                href={doc.externalLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={cn("flex-1 bg-white border-2 border-slate-100 text-slate-700 py-2.5 md:py-3 rounded-xl font-bold text-[10px] md:text-xs flex items-center justify-center gap-2 transition-all", "hover:"+theme.border, "hover:"+theme.text)}
+                              >
+                                <ExternalLink size={14} />
+                                View Official
+                              </a>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

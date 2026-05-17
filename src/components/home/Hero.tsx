@@ -20,6 +20,24 @@ const SLIDES = [
     subtitle: 'Fast and reliable delivery across the globe.',
     image: 'https://images.unsplash.com/photo-1594832284157-fb3286f7779d?auto=format&fit=crop&q=80&w=1920',
     color: 'bg-maroon-900/40'
+  },
+  {
+    title: 'Parcel Services',
+    subtitle: 'Safe and secure delivery for your commercial and personal goods.',
+    image: 'https://images.unsplash.com/photo-1612630741022-b29ec17d013d?auto=format&fit=crop&q=80&w=1920',
+    color: 'bg-blue-900/40'
+  },
+  {
+    title: 'International Mails',
+    subtitle: 'Connecting you to over 200 countries with ease and speed.',
+    image: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&q=80&w=1920',
+    color: 'bg-indigo-900/40'
+  },
+  {
+    title: 'Citizen Services',
+    subtitle: 'Bringing governance and community services closer to every citizen.',
+    image: 'https://images.unsplash.com/photo-1577962914165-d0693a4667ca?auto=format&fit=crop&q=80&w=1920',
+    color: 'bg-emerald-900/40'
   }
 ];
 

@@ -18,9 +18,9 @@ const OTHERS_LINKS = [
   { name: 'India Post Official', url: 'https://www.indiapost.gov.in/' },
   { name: 'Dhenkanal Postal Division', url: 'https://dhenkanalpostaldivision.org/' },
   { name: 'Office Directory', url: 'https://office-directory.vercel.app/' },
-  { name: 'Dakshiksha', url: 'https://dakshiksha-tukukalandis-projects.vercel.app/' },
   { name: 'Circulars', url: 'https://circulars.vercel.app/' },
-  { name: 'Forms and Downloads', url: 'https://postal-forms.vercel.app/' },
+  { name: 'Staff Site', url: 'https://staffsite-dklrs.vercel.app/' },
+  { name: 'Forms and Downloads', url: 'https://indiapost-repository.vercel.app/' },
 ];
 
 export default function Navbar() {

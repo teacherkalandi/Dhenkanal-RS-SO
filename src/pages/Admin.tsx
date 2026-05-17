@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, signInWithGoogle, db } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText } from 'lucide-react';
+import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink } from 'lucide-react';
 import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, serverTimestamp, query, orderBy, where } from 'firebase/firestore';
 import { formatDate, cn } from '../lib/utils';
 
@@ -423,14 +423,33 @@ function DocumentManagement() {
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Description</label>
                     <textarea rows={3} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Brief summary..." />
                  </div>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-gray-100">
+                    <div className="flex flex-col justify-center">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Drive Repository</p>
+                      <a 
+                        href="https://drive.google.com/drive/folders/12n_G6cD8Ps-N2DvPm45HI17PhYmNYsOl?usp=sharing" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-1"
+                      >
+                        <ExternalLink size={12} />
+                        Open Official G-Drive Folder
+                      </a>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-xl">
+                      <p className="text-[9px] text-blue-800 leading-tight">
+                        <strong>Tip:</strong> Upload your file to the correct category subfolder in Drive first, then copy the "Share Link" and paste it below.
+                      </p>
+                    </div>
+                 </div>
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">External Link</label>
-                      <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.externalLink} onChange={e => setForm({...form, externalLink: e.target.value})} placeholder="Official URL" />
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">External Link (Official URL)</label>
+                      <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.externalLink} onChange={e => setForm({...form, externalLink: e.target.value})} placeholder="e.g. indiapost.gov.in link" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">File URL (G-Drive / S3)</label>
-                      <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.fileUrl} onChange={e => setForm({...form, fileUrl: e.target.value})} placeholder="Direct download link" />
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">G-Drive File Link</label>
+                      <input required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.fileUrl} onChange={e => setForm({...form, fileUrl: e.target.value})} placeholder="https://drive.google.com/..." />
                     </div>
                  </div>
                  <button disabled={loading} className="w-full bg-[#D8232A] text-white py-4 rounded-2xl font-bold uppercase tracking-widest mt-6 shadow-xl shadow-red-500/20">

@@ -10,7 +10,6 @@ const QUICK_LINKS = [
   { name: 'Customer Login', url: 'https://app.indiapost.gov.in/customer-selfservice/login' },
   { name: 'Office Directory', url: 'https://office-directory.vercel.app/' },
   { name: 'Find Your Digipin', url: 'https://dac.indiapost.gov.in/mydigipin/home' },
-  { name: 'Forms and Downloads', url: 'https://postal-forms.vercel.app/' },
 ];
 
 export default function Footer() {
