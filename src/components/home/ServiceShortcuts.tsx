@@ -1,10 +1,11 @@
 import React from 'react';
-import { Search, Calculator, MapPin, Landmark, Banknote, UserCheck, Download, Pin, LogIn } from 'lucide-react';
+import { Search, Calculator, MapPin, Landmark, Banknote, UserCheck, Download, Pin, LogIn, PiggyBank } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '../../lib/utils';
 
 const SHORTCUTS = [
   { name: 'Calculate Postage', icon: Calculator, url: 'https://www.indiapost.gov.in/calculate-postage', color: 'text-blue-600' },
+  { name: 'Savings Schemes', icon: PiggyBank, url: 'https://www.indiapost.gov.in/banking-services/savings', color: 'text-pink-600' },
   { name: 'Internet Banking', icon: Landmark, url: 'https://ebanking.indiapost.gov.in/corp/AuthenticationController?FORMSGROUP_ID__=AuthenticationFG&__START_TRAN_FLAG__=Y&__FG_BUTTONS__=LOAD&ACTION.LOAD=Y&AuthenticationFG.LOGIN_FLAG=1&BANK_ID=DOP', color: 'text-amber-600' },
   { name: 'IPPB', icon: Banknote, url: 'https://ippbonline.bank.in/en/web/ippb', color: 'text-indigo-600' },
   { name: 'Aadhaar Services', icon: UserCheck, url: 'https://uidai.gov.in/en/my-aadhaar/get-aadhaar.html', color: 'text-emerald-600' },

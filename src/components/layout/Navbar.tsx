@@ -15,6 +15,7 @@ const NAVIGATION = [
 ];
 
 const OTHERS_LINKS = [
+  { name: 'APT 2.0', url: 'https://app.indiapost.gov.in/idam/realms/indiapost/protocol/openid-connect/auth?response_type=code&client_id=internal_client&redirect_uri=https%3A%2F%2Fapp.indiapost.gov.in%2Femployeeportal%2Fapi%2Fauth%2Fcallback%2Fkeycloak&nextauth=keycloak&code_challenge=HyUtZycbyT_gH1z11RQt8q3uBB88QSuuHr7TqIoZa7I&code_challenge_method=S256&scope=openid+profile+email' },
   { name: 'India Post Official', url: 'https://www.indiapost.gov.in/' },
   { name: 'Dhenkanal Postal Division', url: 'https://dhenkanalpostaldivision.org/' },
   { name: 'Office Directory', url: 'https://office-directory.vercel.app/' },

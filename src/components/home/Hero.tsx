@@ -93,12 +93,20 @@ export default function Hero() {
                 {SLIDES[current].subtitle}
               </p>
               <div className="flex gap-4">
-                <button className="bg-ip-red hover:bg-red-600 px-10 py-4 rounded-lg text-[11px] font-black text-white uppercase tracking-[0.2em] transition-all shadow-2xl hover:scale-105 active:scale-95">
+                <button 
+                  onClick={() => document.getElementById('service-request')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-ip-red hover:bg-red-600 px-10 py-4 rounded-lg text-[11px] font-black text-white uppercase tracking-[0.2em] transition-all shadow-2xl hover:scale-105 active:scale-95"
+                >
                   Explore Services
                 </button>
-                <button className="bg-white/10 hover:bg-white/20 backdrop-blur-md px-10 py-4 rounded-lg text-[11px] font-black text-white uppercase tracking-[0.2em] transition-all border border-white/20">
-                  Account Details
-                </button>
+                <a 
+                  href="https://www.indiapost.gov.in/banking-services/savings"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-md px-10 py-4 rounded-lg text-[11px] font-black text-white uppercase tracking-[0.2em] transition-all border border-white/20 flex items-center"
+                >
+                  Savings Schemes
+                </a>
               </div>
             </motion.div>
           </div>
