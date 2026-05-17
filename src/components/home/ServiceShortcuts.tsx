@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { cn } from '../../lib/utils';
 
 const SHORTCUTS = [
+  { name: 'Track Consignment', icon: Search, url: 'https://www.indiapost.gov.in/', color: 'text-ip-red' },
   { name: 'Calculate Postage', icon: Calculator, url: 'https://www.indiapost.gov.in/calculate-postage', color: 'text-blue-600' },
   { name: 'Savings Schemes', icon: PiggyBank, url: 'https://www.indiapost.gov.in/banking-services/savings', color: 'text-pink-600' },
   { name: 'Internet Banking', icon: Landmark, url: 'https://ebanking.indiapost.gov.in/corp/AuthenticationController?FORMSGROUP_ID__=AuthenticationFG&__START_TRAN_FLAG__=Y&__FG_BUTTONS__=LOAD&ACTION.LOAD=Y&AuthenticationFG.LOGIN_FLAG=1&BANK_ID=DOP', color: 'text-amber-600' },
@@ -17,7 +18,7 @@ const SHORTCUTS = [
 
 export default function ServiceShortcuts() {
   return (
-    <section className="bg-gray-50 py-12 border-b">
+    <section className="bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
           {SHORTCUTS.map((item, i) => (

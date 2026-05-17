@@ -7,7 +7,6 @@ const QUICK_LINKS = [
   { name: 'Calculate Postage', url: 'https://www.indiapost.gov.in/calculate-postage' },
   { name: 'Internet Banking', url: 'https://ebanking.indiapost.gov.in/corp/AuthenticationController?FORMSGROUP_ID__=AuthenticationFG&__START_TRAN_FLAG__=Y&__FG_BUTTONS__=LOAD&ACTION.LOAD=Y&AuthenticationFG.LOGIN_FLAG=1&BANK_ID=DOP' },
   { name: 'IPPB', url: 'https://ippbonline.bank.in/en/web/ippb' },
-  { name: 'Customer Login', url: 'https://app.indiapost.gov.in/customer-selfservice/login' },
   { name: 'Office Directory', url: 'https://office-directory.vercel.app/' },
   { name: 'Find Your Digipin', url: 'https://dac.indiapost.gov.in/mydigipin/home' },
 ];
@@ -74,15 +73,7 @@ export default function Footer() {
 
         {/* Admin & Logo */}
         <div className="space-y-8 flex flex-col items-end text-right">
-          <div className="bg-white/5 p-5 rounded-2xl border border-white/10 w-full">
-            <div className="flex items-center gap-4 justify-end">
-              <div>
-                <p className="text-[10px] uppercase opacity-60 font-black tracking-widest">Official Status</p>
-                <p className="text-sm font-black text-ip-amber">SECURE GOVT PORTAL</p>
-              </div>
-              <ShieldCheck className="text-ip-amber" size={32} />
-            </div>
-          </div>
+
           <div className="flex flex-col items-end gap-2 pr-2">
              <img 
               src="https://upload.wikimedia.org/wikipedia/en/3/32/India_Post.svg" 

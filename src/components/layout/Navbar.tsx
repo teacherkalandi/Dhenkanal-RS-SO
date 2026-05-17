@@ -15,6 +15,8 @@ const NAVIGATION = [
 ];
 
 const OTHERS_LINKS = [
+  { name: 'Customer Login', url: 'https://app.indiapost.gov.in/customer-selfservice/login' },
+  { name: 'Track Consignment', url: 'https://www.indiapost.gov.in/' },
   { name: 'APT 2.0', url: 'https://app.indiapost.gov.in/idam/realms/indiapost/protocol/openid-connect/auth?response_type=code&client_id=internal_client&redirect_uri=https%3A%2F%2Fapp.indiapost.gov.in%2Femployeeportal%2Fapi%2Fauth%2Fcallback%2Fkeycloak&nextauth=keycloak&code_challenge=HyUtZycbyT_gH1z11RQt8q3uBB88QSuuHr7TqIoZa7I&code_challenge_method=S256&scope=openid+profile+email' },
   { name: 'India Post Official', url: 'https://www.indiapost.gov.in/' },
   { name: 'Dhenkanal Postal Division', url: 'https://dhenkanalpostaldivision.org/' },
@@ -154,7 +156,7 @@ export default function Navbar() {
                             href={link.url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="block px-6 py-4 text-[11px] font-bold text-slate-700 hover:bg-slate-50 hover:text-ip-red border-b border-slate-100 last:border-0 uppercase tracking-wide transition-colors"
+                            className="block px-6 py-4 text-[11px] font-bold text-slate-700 hover:bg-slate-50 hover:text-ip-red uppercase tracking-wide transition-colors"
                           >
                             {link.name}
                           </a>
@@ -186,7 +188,7 @@ export default function Navbar() {
             </button>
             <div className="flex flex-col gap-8 pb-20">
               <div className="space-y-4">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-2">Navigation</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Navigation</p>
                 {NAVIGATION.map(item => (
                   <Link 
                     key={item.name} 
@@ -201,7 +203,7 @@ export default function Navbar() {
               </div>
               
               <div className="space-y-4">
-                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-2">External Links</p>
+                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">External Links</p>
                  <div className="grid grid-cols-1 gap-3">
                   {OTHERS_LINKS.map(link => (
                     <a 
