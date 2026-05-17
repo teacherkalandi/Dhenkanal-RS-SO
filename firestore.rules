@@ -59,6 +59,12 @@ service cloud.firestore {
     }
 
     // --- COLLECTION RULES ---
+    
+    match /site_stats/visitors {
+      allow read: if true;
+      allow create: if incoming().count is number;
+      allow update: if true; // Allow anyone to increment the counter
+    }
 
     // Public Collections (Read only for public, write for admin)
     match /news/{newsId} {
@@ -96,12 +102,6 @@ service cloud.firestore {
         'account_opening_requests', 'plirpli_requests', 'other_help_requests'
       ] && isValidId(requestId) && isValidRequest(incoming());
       allow delete: if isAdmin();
-    }
-
-    match /site_stats/{statId} {
-      allow read: if true;
-      allow update: if statId == 'visitors' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count']);
-      allow create: if isAdmin() && statId == 'visitors';
     }
   }
 }

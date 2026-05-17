@@ -2,5 +2,5 @@
   "name": "Dhenkanal RS SO",
   "description": "Official portal for Dhenkanal RS SO, Department of Posts, Dhenkanal Postal Division, Odisha. Featuring service requests, document management, and community updates.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
