@@ -13,8 +13,8 @@ import { doc, updateDoc, increment, setDoc, getDoc } from 'firebase/firestore';
 export default function App() {
   useEffect(() => {
     const trackVisitor = async () => {
+      const visitorDoc = doc(db, 'site_stats', 'visitors');
       try {
-        const visitorDoc = doc(db, 'site_stats', 'visitors');
         const snap = await getDoc(visitorDoc);
         if (snap.exists()) {
           await updateDoc(visitorDoc, { count: increment(1) });
@@ -22,14 +22,12 @@ export default function App() {
           try {
             await setDoc(visitorDoc, { count: 1 });
           } catch (e) {
-            // Silently fail for regular users
+            // Admin only usually for creation based on rules, so if it fails it's fine
+            console.log("Visitor doc initialize failed - expected if not admin");
           }
         }
       } catch (error) {
-        // Only log if it's not a permission error
-        if (error instanceof Error && !error.message.includes('permission-denied')) {
-          console.error("Error tracking visitor:", error);
-        }
+        console.error("Error tracking visitor:", error);
       }
     };
     trackVisitor();
