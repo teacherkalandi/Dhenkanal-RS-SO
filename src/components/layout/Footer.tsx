@@ -69,6 +69,7 @@ export default function Footer() {
             <li><a href="https://dac.indiapost.gov.in/mydigipin/home" className="hover:text-ip-amber">DigiPin Registration</a></li>
             <li><a href="https://app.indiapost.gov.in/customer-selfservice/login" className="hover:text-ip-amber">Customer Login</a></li>
             <li><a href="https://epost-indiapost.gov.in/Home.aspx" target="_blank" rel="noopener noreferrer" className="hover:text-ip-amber">ePost Services</a></li>
+            <li><a href="https://pmvportal.udyamimitra.in/Login" target="_blank" rel="noopener noreferrer" className="hover:text-ip-amber">PM Vishwakarma Portal</a></li>
           </ul>
         </div>
 

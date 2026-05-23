@@ -45,18 +45,23 @@ export default function CategoryPage() {
   useEffect(() => {
     const q = query(
       collection(db, "documents"),
-      where("category", "==", categoryId),
-      orderBy("createdAt", "desc"),
+      where("category", "==", categoryId)
     );
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        setDocuments(
-          snapshot.docs.map(
-            (doc) => ({ id: doc.id, ...doc.data() }) as Document,
-          ),
+        const fetchedDocs = snapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() }) as Document
         );
+        // Sort manually by createdAt to avoid needing a composite index
+        fetchedDocs.sort((a, b) => {
+          const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          return timeB - timeA;
+        });
+        
+        setDocuments(fetchedDocs);
         setLoading(false);
       },
       (error) => {

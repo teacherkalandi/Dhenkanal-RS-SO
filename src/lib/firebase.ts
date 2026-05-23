@@ -4,9 +4,23 @@ import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
 export const auth = getAuth(app);
+
 export const googleProvider = new GoogleAuthProvider();
+// Request Google Drive scope so we can write files to the target folder
+googleProvider.addScope('https://www.googleapis.com/auth/drive');
+
+// In-memory token cache
+let cachedAccessToken: string | null = null;
+
+export const setCachedToken = (token: string | null) => {
+  cachedAccessToken = token;
+};
+
+export const getCachedToken = () => {
+  return cachedAccessToken;
+};
 
 // Test Connection
 async function testConnection() {
@@ -20,4 +34,16 @@ async function testConnection() {
 }
 testConnection();
 
-export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+export const signInWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if (credential?.accessToken) {
+      setCachedToken(credential.accessToken);
+    }
+    return result;
+  } catch (error) {
+    console.error("Error signing in with Google:", error);
+    throw error;
+  }
+};
