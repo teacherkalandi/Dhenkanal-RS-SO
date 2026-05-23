@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { auth, signInWithGoogle, db, getCachedToken } from '../lib/firebase';
+import { auth, signInWithGoogle, db } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Upload } from 'lucide-react';
+import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink } from 'lucide-react';
 import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, serverTimestamp, query, orderBy, where } from 'firebase/firestore';
 import { formatDate, cn } from '../lib/utils';
 
@@ -331,21 +331,9 @@ function DocumentManagement() {
     title: '', category: CATEGORIES[0], subCategory: '', description: '', fileUrl: '', externalLink: ''
   });
 
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadingFile, setUploadingFile] = useState(false);
-  const [uploadError, setUploadError] = useState('');
-  const [uploadSuccess, setUploadSuccess] = useState('');
-  const [gDriveAuthorized, setGDriveAuthorized] = useState(false);
-
   useEffect(() => {
     fetchDocs();
   }, []);
-
-  useEffect(() => {
-    setGDriveAuthorized(!!getCachedToken());
-    setUploadError('');
-    setUploadSuccess('');
-  }, [showAdd]);
 
   const fetchDocs = async () => {
     const q = query(collection(db, 'documents'), orderBy('createdAt', 'desc'));
@@ -375,103 +363,6 @@ function DocumentManagement() {
     if (!confirm('Are you sure?')) return;
     await deleteDoc(doc(db, 'documents', id));
     fetchDocs();
-  };
-
-  const handleConnectDrive = async () => {
-    try {
-      setUploadError('');
-      await signInWithGoogle();
-      setGDriveAuthorized(true);
-    } catch (err: any) {
-      setUploadError('Failed to authorize Google Drive. Please make sure popups are allowed and try again.');
-      console.error(err);
-    }
-  };
-
-  const handleUploadFile = async (file: File) => {
-    setUploadingFile(true);
-    setUploadError('');
-    setUploadSuccess('');
-    try {
-      const token = getCachedToken();
-      if (!token) {
-        setGDriveAuthorized(false);
-        throw new Error("Access token not found. Please click 'Authorize G-Drive' first.");
-      }
-      
-      const metadata = {
-        name: file.name,
-        parents: ["1QddKW3oRxO8M4Uf_IyFiZfsYekcykUJI"]
-      };
-
-      const formData = new FormData();
-      formData.append(
-        'metadata',
-        new Blob([JSON.stringify(metadata)], { type: 'application/json' })
-      );
-      formData.append('file', file);
-
-      const response = await fetch(
-        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setGDriveAuthorized(false);
-          throw new Error("Session expired. Please re-authorize Google Drive using the button above.");
-        }
-        const err = await response.json();
-        throw new Error(err.error?.message || 'Failed to upload to Google Drive');
-      }
-
-      const result = await response.json();
-      const driveLink = `https://drive.google.com/file/d/${result.id}/view?usp=drivesdk`;
-      
-      setForm(prev => ({
-        ...prev,
-        title: prev.title || file.name.replace(/\.[^/.]+$/, ""),
-        fileUrl: driveLink
-      }));
-      
-      setUploadSuccess(`Successfully uploaded "${file.name}" to Google Drive folder!`);
-    } catch (err: any) {
-      setUploadError(err.message || 'Error uploading file.');
-      console.error(err);
-    } finally {
-      setUploadingFile(false);
-    }
-  };
-
-  const onDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const onDragLeave = () => {
-    setIsDragOver(false);
-  };
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      handleUploadFile(file);
-    }
-  };
-
-  const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleUploadFile(file);
-    }
   };
 
   return (
@@ -539,72 +430,24 @@ function DocumentManagement() {
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Description</label>
                     <textarea rows={3} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Brief summary..." />
                  </div>
-                 {/* Google Drive Drag & Drop File Upload Section */}
-                 <div className="bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 flex flex-col gap-4">
-                   <div className="flex items-center justify-between">
-                     <div>
-                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Google Drive Upload</p>
-                       <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Upload files directly to dynamic directory</p>
-                     </div>
-                     <a 
-                       href="https://drive.google.com/drive/folders/1QddKW3oRxO8M4Uf_IyFiZfsYekcykUJI?usp=sharing" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-1 bg-blue-50 px-3 py-1.5 rounded-full"
-                     >
-                       <ExternalLink size={10} />
-                       Open Folder
-                     </a>
-                   </div>
-
-                   {!gDriveAuthorized ? (
-                     <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center shadow-sm">
-                       <Upload className="mx-auto text-gray-400 mb-2 font-black" size={24} />
-                       <p className="text-xs font-bold text-gray-700">Connect Google Drive to Upload</p>
-                       <p className="text-[9.5px] text-gray-400 mb-4 max-w-sm mx-auto leading-relaxed">Direct file upload requires authenticating with Google Drive permissions.</p>
-                       <button
-                         type="button"
-                         onClick={handleConnectDrive}
-                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] uppercase tracking-widest py-2.5 px-4 rounded-xl inline-flex items-center gap-2 transition-colors duration-200"
-                       >
-                         <ShieldCheck size={14} />
-                         Authorize G-Drive
-                       </button>
-                     </div>
-                   ) : (
-                     <div
-                       onDragOver={onDragOver}
-                       onDragLeave={onDragLeave}
-                       onDrop={onDrop}
-                       onClick={() => document.getElementById('file-upload-input')?.click()}
-                       className={cn(
-                         "border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer bg-white relative",
-                         isDragOver ? "border-blue-500 bg-blue-50/50" : "border-gray-200 hover:border-blue-400"
-                       )}
-                     >
-                       <input
-                         id="file-upload-input"
-                         type="file"
-                         className="hidden"
-                         onChange={onFileSelect}
-                       />
-                       {uploadingFile ? (
-                         <div className="space-y-2 py-2">
-                           <Loader2 className="animate-spin text-blue-600 mx-auto" size={24} />
-                           <p className="text-xs font-bold text-gray-600">Uploading file to Google Drive...</p>
-                         </div>
-                       ) : (
-                         <div className="space-y-1">
-                           <Upload className="mx-auto text-blue-500 mb-1" size={24} />
-                           <p className="text-xs font-bold text-gray-700">Drag & drop your file here, or <span className="text-blue-600 underline">browse</span></p>
-                           <p className="text-[9px] text-gray-400">PDF, Excel, Images, Word up to 100MB</p>
-                         </div>
-                       )}
-                     </div>
-                   )}
-
-                   {uploadError && <p className="text-[10px] font-bold text-red-600 bg-red-50 p-3 rounded-xl">{uploadError}</p>}
-                   {uploadSuccess && <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 p-3 rounded-xl">{uploadSuccess}</p>}
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-gray-100">
+                    <div className="flex flex-col justify-center">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Drive Repository</p>
+                      <a 
+                        href="https://drive.google.com/drive/folders/12n_G6cD8Ps-N2DvPm45HI17PhYmNYsOl?usp=sharing" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-1"
+                      >
+                        <ExternalLink size={12} />
+                        Open Official G-Drive Folder
+                      </a>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-xl">
+                      <p className="text-[9px] text-blue-800 leading-tight">
+                        <strong>Tip:</strong> Upload your file to the correct category subfolder in Drive first, then copy the "Share Link" and paste it below.
+                      </p>
+                    </div>
                  </div>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
                     <div className="space-y-1">
@@ -613,10 +456,10 @@ function DocumentManagement() {
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">G-Drive File Link</label>
-                      <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.fileUrl} onChange={e => setForm({...form, fileUrl: e.target.value})} placeholder="https://drive.google.com/... (auto-fills)" />
+                      <input required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.fileUrl} onChange={e => setForm({...form, fileUrl: e.target.value})} placeholder="https://drive.google.com/..." />
                     </div>
                  </div>
-                 <button disabled={loading || uploadingFile} className="w-full bg-[#D8232A] text-white py-4 rounded-2xl font-bold uppercase tracking-widest mt-6 shadow-xl shadow-red-500/20 disabled:opacity-50">
+                 <button disabled={loading} className="w-full bg-[#D8232A] text-white py-4 rounded-2xl font-bold uppercase tracking-widest mt-6 shadow-xl shadow-red-500/20">
                    {loading ? <Loader2 className="animate-spin mx-auto" /> : 'Save Document'}
                  </button>
                </form>

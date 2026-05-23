@@ -100,7 +100,7 @@ service cloud.firestore {
 
     match /site_stats/{statId} {
       allow read: if true;
-      allow update: if statId == 'visitors';
+      allow update: if statId == 'visitors' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count']);
       allow create: if isAdmin() && statId == 'visitors';
     }
   }
