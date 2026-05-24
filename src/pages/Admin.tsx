@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { auth, signInWithGoogle, db } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink } from 'lucide-react';
-import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, serverTimestamp, query, orderBy, where } from 'firebase/firestore';
+import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Image as ImageIcon } from 'lucide-react';
+import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, serverTimestamp, query, orderBy, where, writeBatch, updateDoc } from 'firebase/firestore';
 import { formatDate, cn } from '../lib/utils';
 
 const ADMIN_EMAIL = 'teacherkalandi@gmail.com';
@@ -13,6 +13,7 @@ const TABS = [
   { id: 'documents', name: 'Documents', icon: FilePlus },
   { id: 'news', name: 'Latest News', icon: Megaphone },
   { id: 'requests', name: 'Service Requests', icon: ClipboardList },
+  { id: 'gallery', name: 'Photo Gallery', icon: ImageIcon },
 ];
 
 const CATEGORIES = [
@@ -124,6 +125,7 @@ export default function Admin() {
           {activeTab === 'documents' && <DocumentManagement key="docs" />}
           {activeTab === 'news' && <NewsManagement key="news" />}
           {activeTab === 'requests' && <ServiceRequestDashboard key="reqs" />}
+          {activeTab === 'gallery' && <GalleryManagement key="gallery" />}
         </AnimatePresence>
       </main>
     </div>
@@ -600,6 +602,512 @@ function ServiceRequestDashboard() {
           </>
         )}
       </div>
+    </motion.div>
+  );
+}
+
+function GalleryManagement() {
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [sourceType, setSourceType] = useState<'file' | 'url'>('file');
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    imageUrl: '',
+    date: new Date().toISOString().split('T')[0]
+  });
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [editingPhoto, setEditingPhoto] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    date: ''
+  });
+
+  const handleEditClick = (photo: any) => {
+    setEditingPhoto(photo);
+    setEditForm({
+      title: photo.title || '',
+      description: photo.description || '',
+      date: photo.date || new Date().toISOString().split('T')[0]
+    });
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPhoto) return;
+    if (!editForm.title.trim()) return;
+
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, 'gallery', editingPhoto.id), {
+        title: editForm.title.trim(),
+        description: editForm.description.trim(),
+        date: editForm.date
+      });
+      setEditingPhoto(null);
+      fetchPhotos();
+    } catch (error) {
+      console.error("Error updating photo:", error);
+      alert("Failed to update photo details. Make sure the database allows edits.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPhotos();
+  }, []);
+
+  const fetchPhotos = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      const fetched = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setPhotos(fetched);
+    } catch (error) {
+      console.error("Error fetching photos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const compressAndResizeImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(event.target?.result as string);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(dataUrl);
+        };
+        img.onerror = (err) => reject(err);
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressAndResizeImage(file);
+      setFilePreview(compressed);
+      setForm(prev => ({ ...prev, imageUrl: compressed }));
+    } catch (err) {
+      console.error("Error compressing image:", err);
+      alert("Failed to process image file. Please try another one.");
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert("Please upload an image file (PNG/JPG).");
+      return;
+    }
+    try {
+      const compressed = await compressAndResizeImage(file);
+      setFilePreview(compressed);
+      setForm(prev => ({ ...prev, imageUrl: compressed }));
+    } catch (err) {
+      console.error("Error compressing image:", err);
+    }
+  };
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title.trim()) return;
+    if (!form.imageUrl.trim()) {
+      alert("Please upload a file or paste an image URL.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await addDoc(collection(db, 'gallery'), {
+        title: form.title,
+        description: form.description,
+        imageUrl: form.imageUrl,
+        date: form.date,
+        createdAt: serverTimestamp()
+      });
+      setShowAdd(false);
+      setForm({ title: '', description: '', imageUrl: '', date: new Date().toISOString().split('T')[0] });
+      setFilePreview(null);
+      fetchPhotos();
+    } catch (error) {
+      console.error("Error saving gallery photo:", error);
+      alert("Failed to save image. Make sure image file is small (under 1MB).");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this photo from the gallery?')) return;
+    try {
+      await deleteDoc(doc(db, 'gallery', id));
+      fetchPhotos();
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+    }
+  };
+
+  const handleInitializeSamples = async () => {
+    if (!confirm("Populate the gallery with 3 professional India Post event sample photos?")) return;
+    setSaving(true);
+    try {
+      const samples = [
+        {
+          title: "SPARSH Yojana Philately Scholarship Award",
+          description: "Young outstanding scholarship winners receiving awards from Senior Postmaster at Dhenkanal Division Head Post Office.",
+          imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800",
+          date: "2026-05-15",
+          createdAt: serverTimestamp()
+        },
+        {
+          title: "Head Post Office Aadhaar Enrollment Camp",
+          description: "A special public outreach block camp helping senior citizens and children update biometric Aadhaar details securely.",
+          imageUrl: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&q=80&w=800",
+          date: "2026-05-10",
+          createdAt: serverTimestamp()
+        },
+        {
+          title: "Postal Savings Promotion & Philately Exhibition",
+          description: "Our interactive community stall explaining SSA, PPF accounts and presenting historical stamp collections to students.",
+          imageUrl: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&q=80&w=800",
+          date: "2026-05-20",
+          createdAt: serverTimestamp()
+        }
+      ];
+
+      for (const sample of samples) {
+        await addDoc(collection(db, 'gallery'), sample);
+      }
+      fetchPhotos();
+    } catch (error) {
+      console.error("Error initializing sample photos:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-12">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-black text-[#8B0000] uppercase">Photo Gallery Management</h2>
+
+          {/* Edit Modal / Dialog */}
+          <AnimatePresence>
+            {editingPhoto && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setEditingPhoto(null)} />
+                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl relative z-10 overflow-hidden text-left">
+                   <div className="bg-[#D8232A] p-8 text-white flex justify-between items-center">
+                     <h3 className="text-2xl font-black uppercase tracking-tight">Edit Photo Details</h3>
+                     <button type="button" onClick={() => setEditingPhoto(null)} className="bg-white/20 p-2 rounded-full"><X /></button>
+                   </div>
+                   
+                   <form onSubmit={handleEditSubmit} className="p-6 md:p-10 space-y-5 max-h-[70vh] overflow-y-auto">
+                     <div className="space-y-1">
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Photo Title / Event</label>
+                       <input required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none font-semibold text-gray-800" value={editForm.title} onChange={e => setEditForm({...editForm, title: e.target.value})} placeholder="e.g. SPARSH Distribution Ceremony" />
+                     </div>
+
+                     <div className="space-y-1">
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Event Date</label>
+                       <input type="date" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none font-semibold text-gray-800" value={editForm.date} onChange={e => setEditForm({...editForm, date: e.target.value})} />
+                     </div>
+
+                     <div className="space-y-1">
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Event Description</label>
+                       <textarea rows={4} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none font-semibold text-gray-700" value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} placeholder="Give a brief summary of the photograph..." />
+                     </div>
+
+                     <div className="space-y-1 block shrink-0">
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Photo Preview</label>
+                       <div className="relative rounded-2xl overflow-hidden h-40 border bg-slate-950 flex items-center justify-center shadow-inner">
+                         <img referrerPolicy="no-referrer" src={editingPhoto.imageUrl} className="max-h-full max-w-full object-contain relative z-10" />
+                         <img referrerPolicy="no-referrer" src={editingPhoto.imageUrl} className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 scale-110 pointer-events-none" />
+                       </div>
+                     </div>
+
+                     <button disabled={saving} className="w-full bg-[#D8232A] text-white py-4 rounded-2xl font-bold uppercase tracking-widest mt-6 shadow-xl shadow-red-500/20 flex items-center justify-center gap-2">
+                       {saving ? <Loader2 className="animate-spin" /> : <Save size={16} />}
+                       {saving ? 'Saving...' : 'Save Changes'}
+                     </button>
+                   </form>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Manage public/internal event photos</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          {photos.length === 0 && (
+            <button 
+              type="button"
+              onClick={handleInitializeSamples}
+              disabled={saving}
+              className="bg-slate-100 hover:bg-slate-250 border border-slate-200 text-slate-705 px-6 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all text-xs"
+            >
+              Add Sample Photos
+            </button>
+          )}
+          <button 
+            type="button"
+            onClick={() => setShowAdd(true)}
+            className="bg-[#D8232A] text-white px-8 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-[#8B0000] transition-all shadow-xl shadow-red-500/20 w-full md:w-auto"
+          >
+            <Plus size={20} />
+            Upload Photo
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="h-64 flex items-center justify-center">
+          <Loader2 className="animate-spin text-red-600" size={32} />
+        </div>
+      ) : photos.length === 0 ? (
+        <div className="bg-white rounded-3xl p-16 text-center border border-dashed border-gray-200 max-w-xl mx-auto">
+          <ImageIcon className="mx-auto text-gray-300 w-16 h-16 mb-6" />
+          <h3 className="text-xl font-extrabold text-gray-700 uppercase tracking-tight mb-2">No Photos Found</h3>
+          <p className="text-sm text-gray-400 mb-8 max-w-sm mx-auto">
+            You haven't uploaded any photos to the gallery yet. Click the button to upload a local photo or initialize 3 standard sample photos.
+          </p>
+          <div className="flex justify-center gap-4">
+            <button 
+              type="button"
+              onClick={handleInitializeSamples}
+              className="bg-gray-100 text-gray-751 font-bold text-xs py-3 px-6 rounded-2xl hover:bg-gray-200 transition-colors"
+            >
+              Add Sample Photos
+            </button>
+            <button 
+              type="button"
+              onClick={() => setShowAdd(true)}
+              className="bg-[#D8232A] text-white font-bold text-xs py-3 px-6 rounded-2xl hover:bg-[#8B0000] shadow-md transition-colors"
+            >
+              Upload Photo
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {photos.map(photo => (
+            <div key={photo.id} className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-gray-100/80 flex flex-col justify-between group hover:shadow-xl hover:-translate-y-1 transition-all h-96">
+              <div className="relative h-48 bg-slate-950 overflow-hidden shrink-0 flex items-center justify-center">
+                {/* Blurred background backdrop to fill frame with matching colors */}
+                <img 
+                  referrerPolicy="no-referrer"
+                  src={photo.imageUrl} 
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 scale-110 pointer-events-none"
+                />
+                <img 
+                  referrerPolicy="no-referrer"
+                  src={photo.imageUrl} 
+                  alt={photo.title}
+                  className="relative z-10 max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                />
+                 <button 
+                  type="button"
+                  onClick={() => handleEditClick(photo)}
+                  className="absolute top-4 right-16 bg-white/90 text-blue-600 hover:bg-blue-50 p-2.5 rounded-full shadow-md hover:scale-105 transition-all cursor-pointer z-20"
+                  title="Edit Photo Info"
+                >
+                  <Edit size={16} />
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => handleDelete(photo.id)}
+                  className="absolute top-4 right-4 bg-white/90 text-red-605 hover:bg-red-50 p-2.5 rounded-full shadow-md hover:scale-105 transition-all cursor-pointer z-20"
+                  title="Delete Photo"
+                >
+                  <Trash2 size={16} />
+                </button>
+                <div className="absolute bottom-3 left-4 bg-black/60 backdrop-blur-md text-white font-extrabold text-[10px] uppercase py-1 px-3 rounded-full tracking-widest leading-none z-20">
+                  {photo.date || "Unknown Date"}
+                </div>
+              </div>
+
+              <div className="p-6 flex-1 flex flex-col justify-between overflow-hidden">
+                <div className="space-y-2 overflow-y-auto pr-1">
+                  <h4 className="font-extrabold text-gray-800 text-base lg:text-lg uppercase tracking-tight leading-snug line-clamp-2">
+                    {photo.title}
+                  </h4>
+                  <p className="text-xs text-gray-500 leading-relaxed font-semibold">
+                    {photo.description || "No description provided."}
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-gray-100 text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-3">
+                  Uploaded {formatDate(photo.createdAt?.toDate ? photo.createdAt.toDate() : photo.createdAt)}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Upload Modal */}
+      <AnimatePresence>
+        {showAdd && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowAdd(false)} />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl relative z-10 overflow-hidden">
+               <div className="bg-[#D8232A] p-8 text-white flex justify-between items-center">
+                 <h3 className="text-2xl font-black uppercase tracking-tight">Upload Gallery Photo</h3>
+                 <button type="button" onClick={() => setShowAdd(false)} className="bg-white/20 p-2 rounded-full"><X /></button>
+               </div>
+               
+               <form onSubmit={handleAdd} className="p-6 md:p-10 space-y-5 max-h-[70vh] overflow-y-auto">
+                 <div className="flex gap-4 border-b pb-4">
+                   <button 
+                     type="button"
+                     onClick={() => { setSourceType('file'); setForm(prev => ({ ...prev, imageUrl: filePreview || '' })); }}
+                     className={cn("flex-1 py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all", sourceType === 'file' ? "bg-red-50 text-[#D8232A]" : "text-gray-400 bg-gray-55")}
+                   >
+                     File Upload
+                   </button>
+                   <button 
+                     type="button"
+                     onClick={() => { setSourceType('url'); setForm(prev => ({ ...prev, imageUrl: '' })); }}
+                     className={cn("flex-1 py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all", sourceType === 'url' ? "bg-red-50 text-[#D8232A]" : "text-gray-400 bg-gray-55")}
+                   >
+                     Direct Image URL
+                   </button>
+                 </div>
+
+                 <div className="space-y-1">
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Photo Title / Event</label>
+                   <input required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="e.g. SPARSH Distribution Ceremony" />
+                 </div>
+
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                   <div className="space-y-1">
+                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Event Date</label>
+                     <input type="date" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
+                   </div>
+                   <div className="space-y-1 flex flex-col justify-center">
+                     <span className="text-[9px] text-gray-400 leading-tight">
+                       Choose the date when the ceremony or camp took place to organize photos chronologically.
+                     </span>
+                   </div>
+                 </div>
+
+                 <div className="space-y-1">
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Event Description</label>
+                   <textarea rows={3} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Give a brief summary of the photograph..." />
+                 </div>
+
+                 {sourceType === 'file' ? (
+                   <div className="space-y-2">
+                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Local Image File</label>
+                     
+                     {filePreview ? (
+                       <div className="relative rounded-2xl overflow-hidden h-40 border bg-gray-50 flex items-center justify-center shadow-inner group">
+                         <img referrerPolicy="no-referrer" src={filePreview} className="h-full w-full object-cover" />
+                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                           <button 
+                             type="button" 
+                             onClick={() => { setFilePreview(null); setForm(prev => ({ ...prev, imageUrl: '' })); }}
+                             className="bg-white text-red-600 font-extrabold text-xs py-2 px-4 rounded-xl cursor-pointer shadow-md"
+                           >
+                             Remove File
+                           </button>
+                         </div>
+                       </div>
+                     ) : (
+                       <div 
+                         onDragOver={handleDragOver}
+                         onDragLeave={handleDragLeave}
+                         onDrop={handleDrop}
+                         className={cn(
+                           "border-2 border-dashed rounded-3xl p-8 text-center transition-colors flex flex-col items-center justify-center cursor-pointer min-h-[160px]",
+                           dragOver ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-55/50 hover:bg-gray-50"
+                         )}
+                         onClick={() => document.getElementById('gallery-file-input')?.click()}
+                       >
+                         <input 
+                           id="gallery-file-input"
+                           type="file" 
+                           accept="image/*"
+                           className="hidden" 
+                           onChange={handleFileChange}
+                         />
+                         <ImageIcon className="text-gray-400 w-10 h-10 mb-2" />
+                         <p className="text-xs font-bold text-gray-650">Drag & drop your image or click to browse</p>
+                         <p className="text-[9px] text-gray-400 mt-1 uppercase tracking-wider">Supports PNG, JPG, JPEG (will be optimized)</p>
+                       </div>
+                     )}
+                   </div>
+                 ) : (
+                   <div className="space-y-1">
+                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Direct Image URL</label>
+                     <input required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.imageUrl} onChange={e => setForm({...form, imageUrl: e.target.value})} placeholder="Paste direct image link (Unsplash, Imgur, etc.)" />
+                     {form.imageUrl && (
+                       <div className="mt-2 rounded-2xl overflow-hidden h-32 border bg-gray-50 relative flex items-center justify-center">
+                         <img referrerPolicy="no-referrer" src={form.imageUrl} className="h-full w-full object-cover" onError={(e)=>{ (e.target as any).src='https://placehold.co/600x400?text=Invalid+Image+URL'; }} />
+                       </div>
+                     )}
+                   </div>
+                 )}
+
+                 <button disabled={saving} className="w-full bg-[#D8232A] text-white py-4 rounded-2xl font-bold uppercase tracking-widest mt-6 shadow-xl shadow-red-500/20 flex items-center justify-center gap-2">
+                   {saving ? <Loader2 className="animate-spin" /> : <Save size={16} />}
+                   {saving ? 'Uploading...' : 'Publish Image'}
+                 </button>
+               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

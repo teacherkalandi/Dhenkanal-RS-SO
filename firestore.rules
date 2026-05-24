@@ -58,9 +58,24 @@ service cloud.firestore {
           && data.submittedAt is timestamp;
     }
 
+    function isValidGalleryImage(data) {
+      return data.title is string && data.title.size() <= 200
+          && data.imageUrl is string && data.imageUrl.size() <= 1048576
+          && (data.get('description', '') is string && data.get('description', '').size() <= 1000)
+          && (data.get('date', '') is string && data.get('date', '').size() <= 100)
+          && data.createdAt is timestamp;
+    }
+
     // --- COLLECTION RULES ---
 
     // Public Collections (Read only for public, write for admin)
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidGalleryImage(incoming()) && isValidId(imageId);
+      allow update: if isAdmin() && isValidGalleryImage(incoming());
+      allow delete: if isAdmin();
+    }
+
     match /news/{newsId} {
       allow read: if true;
       allow create: if isAdmin() && isValidNews(incoming()) && isValidId(newsId);

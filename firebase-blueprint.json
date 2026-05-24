@@ -66,9 +66,26 @@
         "submittedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["name", "address", "mobile", "submittedAt"]
+    },
+    "GalleryImage": {
+      "title": "Gallery Image",
+      "description": "Photos uploaded to the gallery",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "date": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "imageUrl", "createdAt"]
     }
   },
   "firestore": {
+    "/gallery/{imageId}": {
+      "schema": "GalleryImage",
+      "description": "Collection of uploaded gallery photos"
+    },
     "/documents/{docId}": {
       "schema": "Document",
       "description": "Collection of postal documents"
