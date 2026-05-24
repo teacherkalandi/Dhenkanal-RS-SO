@@ -118,7 +118,7 @@ const getDocTheme = (title: string, index: number) => {
   }
   
   // 6. Final List of Students for Exam (Teal)
-  if (normTitle.includes('final list') || normTitle.includes('eligible') || normTitle.whitespaces || normTitle.includes('students for exam')) {
+  if (normTitle.includes('final list') || normTitle.includes('eligible') || normTitle.includes('students for exam')) {
     return {
       bgClass: 'bg-[#2EAD95] bg-gradient-to-br from-[#3ac9b0] to-[#21907b]',
       textColor: 'text-white',
@@ -433,10 +433,10 @@ export default function CategoryPage() {
                             animate={{ opacity: 1, scale: 1 }}
                             onClick={() => setSelectedDocForPreview(doc)}
                             className={cn(
-                              "relative cursor-pointer select-none transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 active:scale-[0.99] group flex flex-col justify-between overflow-hidden",
+                              "relative cursor-pointer select-none transition-all duration-300 hover:-translate-y-1.5 active:scale-[0.99] group flex flex-col justify-between overflow-hidden shadow-md hover:shadow-2xl",
                               viewMode === "grid"
-                                ? "p-6 md:p-8 rounded-[2rem] h-52 md:h-56"
-                                : "p-5 rounded-2xl md:flex-row md:items-center md:justify-between h-auto gap-4 md:gap-6 min-h-[105px]"
+                                ? cn("p-6 md:p-8 rounded-[2rem] h-52 md:h-56", cardTheme.bgClass)
+                                : cn("p-5 rounded-2xl md:flex-row md:items-center md:justify-between h-auto gap-4 md:gap-6 min-h-[105px]", cardTheme.bgClass)
                             )}
                             style={{ 
                               background: cardTheme.bgClass.includes('gradient') 
@@ -445,12 +445,6 @@ export default function CategoryPage() {
                                   ? cardTheme.bgClass.substring(4, cardTheme.bgClass.indexOf(']')) 
                                   : undefined 
                             }}
-                            className={cn(
-                              "cursor-pointer select-none transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5 active:scale-[0.99] group flex flex-col justify-between overflow-hidden",
-                              viewMode === "grid"
-                                ? cn("p-6 md:p-8 rounded-[2rem] h-52 md:h-56", cardTheme.bgClass)
-                                : cn("p-5 rounded-2xl flex-row items-center gap-6 h-auto min-h-[105px]", cardTheme.bgClass)
-                            )}
                             id={`doc-card-${doc.id}`}
                           >
                             {/* Card Body */}
