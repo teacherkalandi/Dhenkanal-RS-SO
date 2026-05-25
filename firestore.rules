@@ -66,9 +66,40 @@ service cloud.firestore {
           && data.createdAt is timestamp;
     }
 
+    function isValidImportantDoc(data) {
+      return data.title is string && data.title.size() <= 300
+          && (data.get('pdfUrl', '') is string && data.get('pdfUrl', '').size() <= 1000)
+          && (data.get('flipbookUrl', '') is string && data.get('flipbookUrl', '').size() <= 1000)
+          && (data.get('isNew', false) is bool)
+          && data.createdAt is timestamp;
+    }
+
+    function isValidNoticeCircular(data) {
+      return data.title is string && data.title.size() <= 500
+          && data.category is string && data.category in ['Notice', 'Accommodation', 'CGHS', 'Pension/Salary', 'Miscellaneous']
+          && (data.get('fileUrl', '') is string && data.get('fileUrl', '').size() <= 1000)
+          && (data.get('isNew', false) is bool)
+          && data.date is string && data.date.size() <= 100
+          && data.createdAt is timestamp;
+    }
+
     // --- COLLECTION RULES ---
 
     // Public Collections (Read only for public, write for admin)
+    match /important_documents/{docId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidImportantDoc(incoming()) && isValidId(docId);
+      allow update: if isAdmin() && isValidImportantDoc(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /notices_circulars/{noticeId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidNoticeCircular(incoming()) && isValidId(noticeId);
+      allow update: if isAdmin() && isValidNoticeCircular(incoming());
+      allow delete: if isAdmin();
+    }
+
     match /gallery/{imageId} {
       allow read: if true;
       allow create: if isAdmin() && isValidGalleryImage(incoming()) && isValidId(imageId);

@@ -79,9 +79,44 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "imageUrl", "createdAt"]
+    },
+    "ImportantDocument": {
+      "title": "Important Document",
+      "description": "Important documents featured on the homepage",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "pdfUrl": { "type": "string" },
+        "flipbookUrl": { "type": "string" },
+        "isNew": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "createdAt"]
+    },
+    "NoticeCircular": {
+      "title": "Notice or Circular",
+      "description": "Notices and Circulars displayed in categorized tabs on the homepage",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string", "enum": ["Notice", "Accommodation", "CGHS", "Pension/Salary", "Miscellaneous"] },
+        "fileUrl": { "type": "string" },
+        "isNew": { "type": "boolean" },
+        "date": { "type": "string", "format": "date" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "date", "createdAt"]
     }
   },
   "firestore": {
+    "/important_documents/{docId}": {
+      "schema": "ImportantDocument",
+      "description": "Collection of important documents shown on home page"
+    },
+    "/notices_circulars/{noticeId}": {
+      "schema": "NoticeCircular",
+      "description": "Collection of notices and circulars shown on home page in tabs"
+    },
     "/gallery/{imageId}": {
       "schema": "GalleryImage",
       "description": "Collection of uploaded gallery photos"

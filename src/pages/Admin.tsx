@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, signInWithGoogle, db } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Image as ImageIcon } from 'lucide-react';
+import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Bell, Image as ImageIcon } from 'lucide-react';
 import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, serverTimestamp, query, orderBy, where, writeBatch, updateDoc } from 'firebase/firestore';
 import { formatDate, cn } from '../lib/utils';
 
@@ -11,6 +11,8 @@ const ADMIN_EMAIL = 'teacherkalandi@gmail.com';
 const TABS = [
   { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
   { id: 'documents', name: 'Documents', icon: FilePlus },
+  { id: 'home-docs', name: 'Homepage Docs', icon: FileText },
+  { id: 'notices', name: 'Notices & Circulars', icon: ClipboardList },
   { id: 'news', name: 'Latest News', icon: Megaphone },
   { id: 'requests', name: 'Service Requests', icon: ClipboardList },
   { id: 'gallery', name: 'Photo Gallery', icon: ImageIcon },
@@ -123,6 +125,8 @@ export default function Admin() {
         <AnimatePresence mode="wait">
           {activeTab === 'dashboard' && <DashboardOverview key="dash" />}
           {activeTab === 'documents' && <DocumentManagement key="docs" />}
+          {activeTab === 'home-docs' && <HomeDocsManagement key="home-docs" />}
+          {activeTab === 'notices' && <NoticeCircularManagement key="notices" />}
           {activeTab === 'news' && <NewsManagement key="news" />}
           {activeTab === 'requests' && <ServiceRequestDashboard key="reqs" />}
           {activeTab === 'gallery' && <GalleryManagement key="gallery" />}
@@ -601,6 +605,377 @@ function ServiceRequestDashboard() {
             </div>
           </>
         )}
+      </div>
+    </motion.div>
+  );
+}
+
+function HomeDocsManagement() {
+  const [docs, setDocs] = useState<any[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    title: '',
+    pdfUrl: '',
+    flipbookUrl: '',
+    isNew: false
+  });
+
+  useEffect(() => {
+    fetchDocs();
+  }, []);
+
+  const fetchDocs = async () => {
+    try {
+      const q = query(collection(db, 'important_documents'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      setDocs(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    } catch (err) {
+      console.error("Error fetching homepage docs:", err);
+    }
+  };
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title.trim()) return;
+    setSaving(true);
+    try {
+      await addDoc(collection(db, 'important_documents'), {
+        title: form.title.trim(),
+        pdfUrl: form.pdfUrl.trim(),
+        flipbookUrl: form.flipbookUrl.trim(),
+        isNew: form.isNew,
+        createdAt: serverTimestamp()
+      });
+      setForm({ title: '', pdfUrl: '', flipbookUrl: '', isNew: false });
+      fetchDocs();
+    } catch (err) {
+      console.error("Error adding document:", err);
+      alert("Failed to save homepage important document");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this document from the homepage?')) return;
+    try {
+      await deleteDoc(doc(db, 'important_documents', id));
+      fetchDocs();
+    } catch (err) {
+      console.error("Error deleting homepage doc:", err);
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+        <div>
+          <h2 className="text-3xl font-black text-[#8B0000] uppercase">Homepage Important Documents</h2>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Manage documents under the "Important Documents" bulletin board on the homepage</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+        <form onSubmit={handleAdd} className="lg:col-span-5 bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 h-fit space-y-5">
+          <h3 className="font-black text-[#D8232A] uppercase tracking-widest text-xs">Add New Document Item</h3>
+          
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Document Title / Event Name</label>
+            <textarea 
+              required 
+              rows={3}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm text-gray-800 focus:ring-2 focus:ring-red-500"
+              placeholder="e.g. National Curriculum Framework for School Education 2023"
+              value={form.title}
+              onChange={e => setForm({...form, title: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">PDF Link / Document Link (Optional)</label>
+            <input 
+              type="url"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm text-gray-800 focus:ring-2 focus:ring-red-500"
+              placeholder="https://drive.google.com/... or other link"
+              value={form.pdfUrl}
+              onChange={e => setForm({...form, pdfUrl: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Flipbook Link (Optional)</label>
+            <input 
+              type="url"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm text-gray-800 focus:ring-2 focus:ring-red-500"
+              placeholder="https://example.com/flipbook"
+              value={form.flipbookUrl}
+              onChange={e => setForm({...form, flipbookUrl: e.target.value})}
+            />
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
+            <input 
+              type="checkbox" 
+              id="isNew"
+              checked={form.isNew} 
+              onChange={e => setForm({...form, isNew: e.target.checked})}
+              className="w-5 h-5 accent-[#D8232A] rounded cursor-pointer"
+            />
+            <label htmlFor="isNew" className="text-xs font-black text-slate-700 uppercase tracking-wider cursor-pointer select-none">
+              Highlight with animated "NEW!" badge
+            </label>
+          </div>
+
+          <button 
+            disabled={saving}
+            className="w-full bg-[#D8232A] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-[#8B0000] disabled:opacity-50 transition-all shadow-xl shadow-red-500/10 cursor-pointer"
+          >
+            {saving ? <Loader2 className="animate-spin" /> : <Plus size={20} />}
+            Publish to Homepage
+          </button>
+        </form>
+
+        <div className="lg:col-span-7 space-y-4">
+          <h3 className="font-black text-gray-400 uppercase tracking-widest text-xs">Live Homepage Items ({docs.length})</h3>
+          
+          {docs.length === 0 ? (
+            <div className="bg-white rounded-[2rem] p-12 text-center text-gray-400 border border-gray-100 shadow-sm">
+              <FileText className="mx-auto mb-2 opacity-40 text-gray-300" size={32} />
+              <p className="text-sm font-bold uppercase tracking-wider">No Items Added Yet</p>
+              <p className="text-xs mt-1 text-gray-400">Add an item on the left to display it on the homepage bulletin card.</p>
+            </div>
+          ) : (
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+              {docs.map(item => (
+                <div key={item.id} className="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 flex items-start justify-between group">
+                  <div className="flex-1 pr-4">
+                    <p className="text-sm font-bold text-gray-800 leading-snug">{item.title}</p>
+                    <div className="flex flex-wrap items-center mt-2.5 gap-x-3 gap-y-1 text-xs">
+                      {item.pdfUrl && <span className="bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-full text-[10px]">PDF: <a href={item.pdfUrl} target="_blank" rel="noreferrer" className="underline font-black hover:text-blue-900">Link</a></span>}
+                      {item.flipbookUrl && <span className="bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-full text-[10px]">Flipbook: <a href={item.flipbookUrl} target="_blank" rel="noreferrer" className="underline font-black hover:text-indigo-900">Link</a></span>}
+                      {item.isNew && <span className="bg-red-50 text-red-600 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider text-[9px] animate-pulse">NEW!</span>}
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleDelete(item.id)}
+                    className="p-2.5 text-gray-350 hover:text-red-500 rounded-full hover:bg-red-50 transition-all shrink-0 cursor-pointer"
+                    title="Delete document"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function NoticeCircularManagement() {
+  const [notices, setNotices] = useState<any[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('Notice');
+  const [form, setForm] = useState({
+    title: '',
+    category: 'Notice',
+    fileUrl: '',
+    isNew: false,
+    date: new Date().toISOString().split('T')[0]
+  });
+
+  useEffect(() => {
+    fetchNotices();
+  }, []);
+
+  const fetchNotices = async () => {
+    try {
+      const q = query(collection(db, 'notices_circulars'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      setNotices(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    } catch (err) {
+      console.error("Error fetching notices:", err);
+    }
+  };
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title.trim()) return;
+    setSaving(true);
+    try {
+      await addDoc(collection(db, 'notices_circulars'), {
+        title: form.title.trim(),
+        category: form.category,
+        fileUrl: form.fileUrl.trim(),
+        isNew: form.isNew,
+        date: form.date,
+        createdAt: serverTimestamp()
+      });
+      setForm({
+        title: '',
+        category: form.category,
+        fileUrl: '',
+        isNew: false,
+        date: new Date().toISOString().split('T')[0]
+      });
+      fetchNotices();
+    } catch (err) {
+      console.error("Error adding notice:", err);
+      alert("Failed to save notice / circular");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this notice/circular?')) return;
+    try {
+      await deleteDoc(doc(db, 'notices_circulars', id));
+      fetchNotices();
+    } catch (err) {
+      console.error("Error deleting notice:", err);
+    }
+  };
+
+  const filteredNotices = notices.filter(n => n.category === activeFilter);
+
+  return (
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+        <div>
+          <h2 className="text-3xl font-black text-[#E59834] uppercase">Notices & Circulars Dashboard</h2>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Manage categorized public notices and circulars displayed on the homepage tabs</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+        <form onSubmit={handleAdd} className="lg:col-span-5 bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 h-fit space-y-5">
+          <h3 className="font-black text-[#E59834] uppercase tracking-widest text-xs">Publish Notice / Circular</h3>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Category Tab</label>
+            <select 
+              required
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm font-semibold text-slate-800 cursor-pointer"
+              value={form.category}
+              onChange={e => setForm({...form, category: e.target.value})}
+            >
+              {['Notice', 'Accommodation', 'CGHS', 'Pension/Salary', 'Miscellaneous'].map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Title / Content Description</label>
+            <textarea 
+              required 
+              rows={3}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm text-gray-800 focus:ring-2 focus:ring-amber-500"
+              placeholder="e.g. Circular Regarding energy conservation and Judicious use of resources..."
+              value={form.title}
+              onChange={e => setForm({...form, title: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Notice Document Link / PDF Link (Optional)</label>
+            <input 
+              type="url"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm text-gray-800 focus:ring-2 focus:ring-amber-500"
+              placeholder="https://drive.google.com/... or other link"
+              value={form.fileUrl}
+              onChange={e => setForm({...form, fileUrl: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Notice Date</label>
+            <input 
+              type="date"
+              required
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm text-gray-800 focus:ring-2 focus:ring-amber-500 cursor-pointer"
+              value={form.date}
+              onChange={e => setForm({...form, date: e.target.value})}
+            />
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
+            <input 
+              type="checkbox" 
+              id="noticeNew"
+              checked={form.isNew} 
+              onChange={e => setForm({...form, isNew: e.target.checked})}
+              className="w-5 h-5 accent-[#E59834] rounded cursor-pointer"
+            />
+            <label htmlFor="noticeNew" className="text-xs font-black text-slate-700 uppercase tracking-wider cursor-pointer select-none">
+              Highlight with animated "NEW!" badge
+            </label>
+          </div>
+
+          <button 
+            disabled={saving}
+            className="w-full bg-[#E59834] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-[#c97e1e] disabled:opacity-50 transition-all shadow-xl shadow-amber-500/10 cursor-pointer"
+          >
+            {saving ? <Loader2 className="animate-spin" /> : <Plus size={20} />}
+            Publish Notice
+          </button>
+        </form>
+
+        <div className="lg:col-span-7 space-y-4">
+          
+          {/* Quick filtering tabs for admin view */}
+          <div className="bg-gray-50 rounded-2xl p-1.5 flex flex-wrap gap-1 border border-gray-100 shadow-inner">
+            {['Notice', 'Accommodation', 'CGHS', 'Pension/Salary', 'Miscellaneous'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveFilter(tab)}
+                className={cn(
+                  "px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer",
+                  activeFilter === tab 
+                    ? "bg-[#E59834] text-white shadow-sm"
+                    : "text-gray-500 hover:bg-white/60 hover:text-[#E59834]"
+                )}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <h3 className="font-black text-gray-400 uppercase tracking-widest text-xs">Live Items in "{activeFilter}" ({filteredNotices.length})</h3>
+          
+          {filteredNotices.length === 0 ? (
+            <div className="bg-white rounded-[2rem] p-12 text-center text-gray-400 border border-gray-100 shadow-sm">
+              <Bell className="mx-auto mb-2 opacity-40 text-gray-300" size={32} />
+              <p className="text-sm font-bold uppercase tracking-wider">No Notices published in this category</p>
+              <p className="text-xs mt-1 text-gray-400">Add an item on the left to show it here.</p>
+            </div>
+          ) : (
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+              {filteredNotices.map(item => (
+                <div key={item.id} className="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 flex items-start justify-between group">
+                  <div className="flex-1 pr-4">
+                    <p className="text-sm font-bold text-gray-800 leading-snug">{item.title}</p>
+                    <div className="flex flex-wrap items-center mt-2.5 gap-x-3 gap-y-1 text-xs">
+                      <span className="bg-amber-50 text-[#E59834] font-semibold px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider">{item.category}</span>
+                      {item.fileUrl && <span className="bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-full text-[10px]">Document: <a href={item.fileUrl} target="_blank" rel="noreferrer" className="underline font-black hover:text-blue-900">Link</a></span>}
+                      {item.isNew && <span className="bg-red-50 text-red-600 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider text-[9px] animate-pulse">NEW!</span>}
+                      {item.date && <span className="text-gray-450 font-bold text-[10px] uppercase tracking-wider">Date: {item.date}</span>}
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleDelete(item.id)}
+                    className="p-2.5 text-gray-350 hover:text-red-500 rounded-full hover:bg-red-50 transition-all shrink-0 cursor-pointer"
+                    title="Delete notice"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </motion.div>
   );

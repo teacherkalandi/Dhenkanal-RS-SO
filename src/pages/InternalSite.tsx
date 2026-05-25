@@ -39,7 +39,7 @@ const OFFICIAL_LINKS = [
     url: 'https://www.indiapost.gov.in/banking-services/savings',
     description: 'Explore national savings schemes, interest rates, and secure post banking.',
     icon: PiggyBank,
-    color: 'bg-emerald-50 border-emerald-100 hover:border-emerald-300 text-emerald-900',
+    color: 'bg-emerald-50 border-emerald-100 hover:border-emerald-300 text-emerald-950',
     iconBg: 'bg-emerald-500 text-white',
     themeColor: '#059669',
   },
@@ -52,29 +52,29 @@ const OFFICIAL_LINKS = [
     iconBg: 'bg-blue-500 text-white',
     themeColor: '#2563eb',
   },
+  {
+    name: 'Forms Download',
+    url: 'https://indiapost-repository.vercel.app/',
+    description: 'Download standard official application forms, deposit slips, and saving utility forms.',
+    icon: Download,
+    color: 'bg-fuchsia-50 border-fuchsia-100 hover:border-fuchsia-300 text-fuchsia-900',
+    iconBg: 'bg-fuchsia-500 text-white',
+    themeColor: '#d946ef',
+  },
+  {
+    name: 'Circulars Portal',
+    url: 'https://circulars.vercel.app/',
+    description: 'Access the central storage for published department circulars and policy guidelines.',
+    icon: Mail,
+    color: 'bg-indigo-50 border-indigo-100 hover:border-indigo-300 text-indigo-900',
+    iconBg: 'bg-indigo-500 text-white',
+    themeColor: '#4f46e5',
+  },
 ];
 
 export default function InternalSite() {
   const [selectedLinkForQR, setSelectedLinkForQR] = React.useState<typeof OFFICIAL_LINKS[number] | null>(null);
   const [copied, setCopied] = React.useState(false);
-  const [photos, setPhotos] = useState<any[]>([]);
-  const [loadingPhotos, setLoadingPhotos] = useState(true);
-  const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null);
-
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
-        const snap = await getDocs(q);
-        setPhotos(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      } catch (err) {
-        console.error("Error fetching photos for gallery:", err);
-      } finally {
-        setLoadingPhotos(false);
-      }
-    };
-    fetchPhotos();
-  }, []);
 
   const downloadSVG = (link: typeof OFFICIAL_LINKS[number]) => {
     const svgId = `qr-code-svg-${link.name.toLowerCase().replace(/[\/\s]/g, '-')}`;
@@ -116,85 +116,6 @@ export default function InternalSite() {
         </div>
         
         <CategoryCards />
-
-        {/* Photo Gallery Section */}
-        <section className="max-w-7xl mx-auto px-6 py-12 border-t border-slate-100 mt-16 pb-6">
-          <div className="flex items-center gap-5 mb-10">
-            <div className="section-heading-line animate-pulse bg-gradient-to-r from-red-500 to-amber-500" />
-            <div>
-              <h2 className="text-3xl font-black text-slate-800 uppercase tracking-tighter">Photo Gallery</h2>
-              <p className="text-xs font-bold text-ip-maroon uppercase tracking-[0.3em] opacity-60">Visual Highlights & Division Events</p>
-            </div>
-          </div>
-
-          {loadingPhotos ? (
-            <div className="py-16 text-center">
-              <Loader2 className="animate-spin text-red-650 mx-auto" size={32} />
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-4">Loading Gallery...</p>
-            </div>
-          ) : photos.length === 0 ? (
-            <div className="bg-slate-50 border border-slate-200/55 rounded-[2.5rem] p-12 text-center max-w-lg mx-auto">
-              <ImageIcon className="text-slate-300 w-12 h-12 mx-auto mb-4" />
-              <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mb-1">Gallery is Empty</p>
-              <p className="text-xs text-slate-400 font-medium font-bold">No event photographs are published yet. Admins can upload photos from the Admin Portal.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {photos.map((photo, i) => (
-                <motion.div
-                  key={photo.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05, duration: 0.5 }}
-                  onClick={() => setSelectedPhoto(photo)}
-                  className="group relative cursor-pointer bg-white rounded-3xl overflow-hidden shadow-xs hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 border border-slate-150 flex flex-col h-96"
-                >
-                  {/* Photo Head */}
-                  <div className="relative h-56 overflow-hidden bg-slate-950 shrink-0 flex items-center justify-center">
-                    {/* Blurred background backdrop to fill frame with matching colors */}
-                    <img
-                      referrerPolicy="no-referrer"
-                      src={photo.imageUrl}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 scale-110 pointer-events-none"
-                    />
-                    <img
-                      referrerPolicy="no-referrer"
-                      src={photo.imageUrl}
-                      alt={photo.title}
-                      className="relative z-10 max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-750 ease-out"
-                    />
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20">
-                      <div className="bg-white/95 text-slate-800 p-3 rounded-full shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300 ease-out">
-                        <ZoomIn size={18} />
-                      </div>
-                    </div>
-                    {photo.date && (
-                      <div className="absolute bottom-3 left-4 bg-black/60 backdrop-blur-md text-white font-extrabold text-[9px] uppercase tracking-widest py-1 px-3 rounded-full leading-none shadow-sm z-20">
-                        {photo.date}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Photo Details */}
-                  <div className="p-6 flex-1 flex flex-col justify-between overflow-hidden">
-                    <div className="space-y-2 overflow-y-auto pr-1">
-                      <h3 className="font-extrabold text-slate-800 text-base uppercase tracking-tight group-hover:text-red-750 transition-colors leading-snug line-clamp-2">
-                        {photo.title}
-                      </h3>
-                      {photo.description && (
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed line-clamp-3">
-                          {photo.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </section>
 
         {/* Official Links Section */}
         <section className="max-w-7xl mx-auto px-6 py-12">
@@ -382,92 +303,6 @@ export default function InternalSite() {
         )}
       </AnimatePresence>
 
-      {/* Lightbox / Enlarged View Modal */}
-      <AnimatePresence>
-        {selectedPhoto && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedPhoto(null)}
-              className="absolute inset-0 bg-slate-950/85 backdrop-blur-md"
-            />
-
-            {/* Lightbox Body */}
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden z-[51] flex flex-col md:flex-row max-h-[90vh]"
-            >
-              {/* Image Frame */}
-              <div className="relative bg-slate-950 flex items-center justify-center min-h-[40vh] md:w-3/5 overflow-hidden">
-                <img
-                  referrerPolicy="no-referrer"
-                  src={selectedPhoto.imageUrl}
-                  alt={selectedPhoto.title}
-                  className="w-full h-full object-contain max-h-[40vh] md:max-h-[80vh]"
-                />
-                
-                {/* Close Overlay Button on Mobile */}
-                <button
-                  onClick={() => setSelectedPhoto(null)}
-                  className="absolute top-4 left-4 md:hidden bg-white/90 text-slate-800 hover:bg-white rounded-full p-2 h-10 w-10 flex items-center justify-center shadow-md cursor-pointer"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              {/* Text / Context Content */}
-              <div className="p-8 md:p-12 md:w-2/5 flex flex-col justify-between bg-white text-slate-800 overflow-y-auto max-h-[50vh] md:max-h-[85vh]">
-                <div>
-                  <div className="hidden md:flex justify-end mb-6">
-                    <button
-                      onClick={() => setSelectedPhoto(null)}
-                      className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-2 h-10 w-10 flex items-center justify-center transition-all cursor-pointer"
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-
-                  {selectedPhoto.date && (
-                    <div className="inline-flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 border border-slate-100 py-1.5 px-3 rounded-xl mb-4 leading-none">
-                      <Calendar size={12} className="text-red-700" />
-                      {selectedPhoto.date}
-                    </div>
-                  )}
-
-                  <h3 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight leading-snug mb-4">
-                    {selectedPhoto.title}
-                  </h3>
-                  
-                  <div className="w-12 h-1 bg-[#D8232A] mb-6" />
-
-                  <p className="text-xs text-slate-600 leading-relaxed font-semibold">
-                    {selectedPhoto.description || "No description provided for this visual snapshot."}
-                  </p>
-                </div>
-
-                <div className="border-t border-slate-100 pt-6 mt-8 flex flex-col gap-2">
-                  <p className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">Dhenkanal Division Gallery</p>
-                  <div className="flex gap-4">
-                    <a 
-                      href={selectedPhoto.imageUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline font-bold flex items-center gap-1"
-                    >
-                      View Original Link
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
