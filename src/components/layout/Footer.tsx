@@ -9,6 +9,7 @@ const QUICK_LINKS = [
   { name: 'IPPB', url: 'https://ippbonline.bank.in/en/web/ippb' },
   { name: 'Office Directory', url: 'https://office-directory.vercel.app/' },
   { name: 'Find Your Digipin', url: 'https://dac.indiapost.gov.in/mydigipin/home' },
+  { name: 'Circulars/Updates', url: 'https://dhenkanalpostaldivision.org/updates/' },
 ];
 
 export default function Footer() {
