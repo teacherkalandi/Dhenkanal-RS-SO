@@ -91,164 +91,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Dynamic Important Documents & Notices Bulletin Board */}
-      <section className="py-16 bg-slate-50/50 border-y border-slate-100">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            
-            {/* IMPORTANT DOCUMENTS COLUMN */}
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col min-h-[480px]">
-              {/* Box Header - Royal Blue exactly like the screenshot */}
-              <div className="bg-[#1b4395] px-6 py-5 flex items-center gap-3 text-white border-b border-[#1b4395]/10">
-                <FileText className="text-white shrink-0 animate-pulse" size={24} />
-                <h3 className="text-lg md:text-xl font-black tracking-wider uppercase m-0 leading-none">Important Documents</h3>
-              </div>
-              
-              <div className="p-6 md:p-8 flex-1 flex flex-col">
-                {loading ? (
-                  <div className="flex-1 flex items-center justify-center py-20">
-                    <Loader2 className="animate-spin text-[#1b4395]" size={36} />
-                  </div>
-                ) : impDocs.length === 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-gray-400 py-12">
-                    <FileText size={48} className="stroke-1 mb-3 opacity-60" />
-                    <p className="text-sm font-bold uppercase tracking-wider">No Important Documents Published</p>
-                    <p className="text-xs text-gray-400 mt-1">Manage documents inside the Admin Dashboard</p>
-                  </div>
-                ) : (
-                  <ul className="space-y-4 flex-1">
-                    {impDocs.map((docItem) => (
-                      <li key={docItem.id} className="flex items-start gap-2.5 pb-3 border-b border-dashed border-gray-100 last:border-0 hover:bg-slate-50/50 p-2 rounded-xl transition-all group">
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D8232A] mt-1.5 shrink-0 group-hover:scale-125 transition-all" />
-                        <div className="flex-1 text-sm leading-relaxed">
-                          <span className="text-[#8B0000] font-black tracking-tight hover:text-[#D8232A] transition-colors pr-2">
-                            {docItem.title}
-                          </span>
-                          
-                          {/* Optional file and flipbook links matching the picture */}
-                          <span className="inline-flex items-center gap-1.5 ml-1 text-xs">
-                            {docItem.pdfUrl && (
-                              <a 
-                                href={docItem.pdfUrl} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                className="text-blue-600 hover:text-blue-800 font-extrabold uppercase hover:underline inline-flex items-center gap-0.5"
-                                title="Open PDF Document"
-                              >
-                                PDF
-                              </a>
-                            )}
-                            {docItem.pdfUrl && docItem.flipbookUrl && <span className="text-gray-300">|</span>}
-                            {docItem.flipbookUrl && (
-                              <a 
-                                href={docItem.flipbookUrl} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                className="text-blue-600 hover:text-blue-800 font-extrabold uppercase hover:underline inline-flex items-center gap-0.5"
-                                title="Open Flipbook link"
-                              >
-                                Flipbook
-                              </a>
-                            )}
-                          </span>
-                          
-                          {docItem.isNew && (
-                            <span className="text-[#D8232A] font-black tracking-widest text-[11px] uppercase ml-2 select-none animate-pulse">
-                              New!
-                            </span>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-
-            {/* NOTICE BOARD COLUMN */}
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col min-h-[480px]">
-              {/* Box Header - Deep Gold / Amber exactly like the screenshot */}
-              <div className="bg-[#E59834] px-6 py-5 flex items-center gap-3 text-white border-b border-[#E59834]/10">
-                <Bell className="text-white shrink-0" size={24} />
-                <h3 className="text-lg md:text-xl font-black tracking-wider uppercase m-0 leading-none">Notice / Circular</h3>
-              </div>
-
-              {/* Tabs Section exactly like screenshot */}
-              <div className="bg-gray-50/80 border-b border-gray-100 px-4 py-2.5">
-                <div className="flex flex-wrap gap-1.5">
-                  {['Notice', 'Accommodation', 'CGHS', 'Pension/Salary', 'Miscellaneous'].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveNoticeTab(tab)}
-                      className={cn(
-                        "px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer",
-                        activeNoticeTab === tab 
-                          ? "bg-white text-blue-700 shadow-sm border border-gray-200/60"
-                          : "text-gray-500 hover:bg-white/60 hover:text-blue-600"
-                      )}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-6 md:p-8 flex-1 flex flex-col">
-                {loading ? (
-                  <div className="flex-1 flex items-center justify-center py-20">
-                    <Loader2 className="animate-spin text-[#E59834]" size={36} />
-                  </div>
-                ) : notices.filter(n => n.category === activeNoticeTab).length === 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-gray-400 py-12">
-                    <Bell size={48} className="stroke-1 mb-3 opacity-60" />
-                    <p className="text-sm font-bold uppercase tracking-wider">No Notices in {activeNoticeTab}</p>
-                    <p className="text-xs text-gray-400 mt-1">Upload notice / circular inside the Admin Dashboard</p>
-                  </div>
-                ) : (
-                  <ul className="space-y-4 flex-1">
-                    {notices.filter(n => n.category === activeNoticeTab).map((notice) => (
-                      <li key={notice.id} className="flex items-start gap-2.5 pb-3 border-b border-dashed border-gray-100 last:border-0 hover:bg-slate-50/50 p-2 rounded-xl transition-all group">
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D8232A] mt-1.5 shrink-0 group-hover:scale-125 transition-all" />
-                        <div className="flex-1 text-sm leading-relaxed">
-                          {notice.fileUrl ? (
-                            <a 
-                              href={notice.fileUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-blue-700 font-bold hover:underline hover:text-blue-900 transition-colors inline leading-snug tracking-tight"
-                            >
-                              {notice.title}
-                            </a>
-                          ) : (
-                            <span className="text-slate-800 font-bold leading-snug tracking-tight">
-                              {notice.title}
-                            </span>
-                          )}
-
-                          {notice.isNew && (
-                            <span className="text-blue-600 font-black tracking-widest text-[11px] uppercase ml-2 select-none animate-pulse">
-                              New!
-                            </span>
-                          )}
-
-                          {notice.date && (
-                            <div className="text-[10px] text-gray-450 font-bold uppercase tracking-wider mt-1.5 flex items-center gap-1.5">
-                              <span>Published:</span>
-                              <span className="text-gray-500">{notice.date}</span>
-                            </div>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
       {/* Photo Gallery Section */}
       <section className="bg-white py-16 border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4">
@@ -420,6 +262,164 @@ export default function Home() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Dynamic Important Documents & Notices Bulletin Board */}
+      <section className="py-16 bg-slate-50/50 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            
+            {/* IMPORTANT DOCUMENTS COLUMN */}
+            <div className="bg-white rounded-[2.5rem] shadow-md hover:shadow-lg border-2 border-[#1b4395]/30 hover:border-[#1b4395]/80 transition-all duration-300 overflow-hidden flex flex-col min-h-[480px]">
+              {/* Box Header - Royal Blue exactly like the screenshot */}
+              <div className="bg-[#1b4395] px-6 py-5 flex items-center gap-3 text-white border-b-2 border-[#1b4395]/10">
+                <FileText className="text-white shrink-0 animate-pulse" size={24} />
+                <h3 className="text-lg md:text-xl font-black tracking-wider uppercase m-0 leading-none">Important Documents</h3>
+              </div>
+              
+              <div className="p-6 md:p-8 flex-1 flex flex-col">
+                {loading ? (
+                  <div className="flex-1 flex items-center justify-center py-20">
+                    <Loader2 className="animate-spin text-[#1b4395]" size={36} />
+                  </div>
+                ) : impDocs.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-gray-400 py-12">
+                    <FileText size={48} className="stroke-1 mb-3 opacity-60" />
+                    <p className="text-sm font-bold uppercase tracking-wider">No Important Documents Published</p>
+                    <p className="text-xs text-gray-400 mt-1">Manage documents inside the Admin Dashboard</p>
+                  </div>
+                ) : (
+                  <ul className="space-y-4 flex-1">
+                    {impDocs.map((docItem) => (
+                      <li key={docItem.id} className="flex items-start gap-2.5 pb-3 border-b border-dashed border-gray-100 last:border-0 hover:bg-slate-50/50 p-2 rounded-xl transition-all group">
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D8232A] mt-1.5 shrink-0 group-hover:scale-125 transition-all" />
+                        <div className="flex-1 text-sm leading-relaxed">
+                          <span className="text-[#8B0000] font-black tracking-tight hover:text-[#D8232A] transition-colors pr-2">
+                            {docItem.title}
+                          </span>
+                          
+                          {/* Optional file and flipbook links matching the picture */}
+                          <span className="inline-flex items-center gap-1.5 ml-1 text-xs">
+                            {docItem.pdfUrl && (
+                              <a 
+                                href={docItem.pdfUrl} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="text-blue-600 hover:text-blue-800 font-extrabold uppercase hover:underline inline-flex items-center gap-0.5"
+                                title="Open PDF Document"
+                              >
+                                PDF
+                              </a>
+                            )}
+                            {docItem.pdfUrl && docItem.flipbookUrl && <span className="text-gray-300">|</span>}
+                            {docItem.flipbookUrl && (
+                              <a 
+                                href={docItem.flipbookUrl} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="text-blue-600 hover:text-blue-800 font-extrabold uppercase hover:underline inline-flex items-center gap-0.5"
+                                title="Open Flipbook link"
+                              >
+                                Flipbook
+                              </a>
+                            )}
+                          </span>
+                          
+                          {docItem.isNew && (
+                            <span className="text-[#D8232A] font-black tracking-widest text-[11px] uppercase ml-2 select-none animate-pulse">
+                              New!
+                            </span>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* NOTICE BOARD COLUMN */}
+            <div className="bg-white rounded-[2.5rem] shadow-md hover:shadow-lg border-2 border-[#E59834]/30 hover:border-[#E59834]/80 transition-all duration-300 overflow-hidden flex flex-col min-h-[480px]">
+              {/* Box Header - Deep Gold / Amber exactly like the screenshot */}
+              <div className="bg-[#E59834] px-6 py-5 flex items-center gap-3 text-white border-b-2 border-[#E59834]/10">
+                <Bell className="text-white shrink-0" size={24} />
+                <h3 className="text-lg md:text-xl font-black tracking-wider uppercase m-0 leading-none">Notice / Circular</h3>
+              </div>
+
+              {/* Tabs Section exactly like screenshot */}
+              <div className="bg-gray-50/80 border-b border-gray-100 px-4 py-2.5">
+                <div className="flex flex-wrap gap-1.5">
+                  {['Notice', 'Accommodation', 'CGHS', 'Pension/Salary', 'Miscellaneous'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveNoticeTab(tab)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer",
+                        activeNoticeTab === tab 
+                          ? "bg-white text-blue-700 shadow-sm border border-gray-200/60"
+                          : "text-gray-500 hover:bg-white/60 hover:text-blue-600"
+                      )}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-6 md:p-8 flex-1 flex flex-col">
+                {loading ? (
+                  <div className="flex-1 flex items-center justify-center py-20">
+                    <Loader2 className="animate-spin text-[#E59834]" size={36} />
+                  </div>
+                ) : notices.filter(n => n.category === activeNoticeTab).length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-gray-400 py-12">
+                    <Bell size={48} className="stroke-1 mb-3 opacity-60" />
+                    <p className="text-sm font-bold uppercase tracking-wider">No Notices in {activeNoticeTab}</p>
+                    <p className="text-xs text-gray-400 mt-1">Upload notice / circular inside the Admin Dashboard</p>
+                  </div>
+                ) : (
+                  <ul className="space-y-4 flex-1">
+                    {notices.filter(n => n.category === activeNoticeTab).map((notice) => (
+                      <li key={notice.id} className="flex items-start gap-2.5 pb-3 border-b border-dashed border-gray-100 last:border-0 hover:bg-slate-50/50 p-2 rounded-xl transition-all group">
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D8232A] mt-1.5 shrink-0 group-hover:scale-125 transition-all" />
+                        <div className="flex-1 text-sm leading-relaxed">
+                          {notice.fileUrl ? (
+                            <a 
+                              href={notice.fileUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-blue-700 font-bold hover:underline hover:text-blue-900 transition-colors inline leading-snug tracking-tight"
+                            >
+                              {notice.title}
+                            </a>
+                          ) : (
+                            <span className="text-slate-800 font-bold leading-snug tracking-tight">
+                              {notice.title}
+                            </span>
+                          )}
+
+                          {notice.isNew && (
+                            <span className="text-blue-600 font-black tracking-widest text-[11px] uppercase ml-2 select-none animate-pulse">
+                              New!
+                            </span>
+                          )}
+
+                          {notice.date && (
+                            <div className="text-[10px] text-gray-450 font-bold uppercase tracking-wider mt-1.5 flex items-center gap-1.5">
+                              <span>Published:</span>
+                              <span className="text-gray-500">{notice.date}</span>
+                            </div>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
 
       {/* About Section */}
       <section className="max-w-7xl mx-auto px-4 py-20 bg-white rounded-[3rem] shadow-sm border border-gray-50 mb-20">
