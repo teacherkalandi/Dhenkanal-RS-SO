@@ -288,7 +288,7 @@ export default function Home() {
                     <p className="text-xs text-gray-400 mt-1">Manage documents inside the Admin Dashboard</p>
                   </div>
                 ) : (
-                  <ul className="space-y-4 flex-1">
+                  <ul className="space-y-4 flex-1 max-h-[360px] overflow-y-auto pr-2 list-scrollbar">
                     {impDocs.map((docItem) => (
                       <li key={docItem.id} className="flex items-start gap-2.5 pb-3 border-b border-dashed border-gray-100 last:border-0 hover:bg-slate-50/50 p-2 rounded-xl transition-all group">
                         <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D8232A] mt-1.5 shrink-0 group-hover:scale-125 transition-all" />
@@ -377,7 +377,7 @@ export default function Home() {
                     <p className="text-xs text-gray-400 mt-1">Upload notice / circular inside the Admin Dashboard</p>
                   </div>
                 ) : (
-                  <ul className="space-y-4 flex-1">
+                  <ul className="space-y-4 flex-1 max-h-[360px] overflow-y-auto pr-2 list-scrollbar">
                     {notices.filter(n => n.category === activeNoticeTab).map((notice) => (
                       <li key={notice.id} className="flex items-start gap-2.5 pb-3 border-b border-dashed border-gray-100 last:border-0 hover:bg-slate-50/50 p-2 rounded-xl transition-all group">
                         <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D8232A] mt-1.5 shrink-0 group-hover:scale-125 transition-all" />

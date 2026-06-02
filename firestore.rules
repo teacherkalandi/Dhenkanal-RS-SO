@@ -83,7 +83,22 @@ service cloud.firestore {
           && data.createdAt is timestamp;
     }
 
+    function isValidDownloadableForm(data) {
+      return data.type is string && data.type.size() <= 100
+          && data.displayName is string && data.displayName.size() <= 200
+          && data.uploadLink is string && data.uploadLink.size() <= 1000
+          && (data.get('description', '') is string && data.get('description', '').size() <= 1000)
+          && data.createdAt is timestamp;
+    }
+
     // --- COLLECTION RULES ---
+
+    match /downloadable_forms/{formId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidDownloadableForm(incoming()) && isValidId(formId);
+      allow update: if isAdmin() && isValidDownloadableForm(incoming());
+      allow delete: if isAdmin();
+    }
 
     // Public Collections (Read only for public, write for admin)
     match /important_documents/{docId} {

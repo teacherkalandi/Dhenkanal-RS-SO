@@ -25,6 +25,21 @@
   scrollbar-width: none;
 }
 
+.list-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.list-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.list-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+}
+.list-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
 @layer components {
   .section-heading-line {
     @apply h-8 w-1.5 bg-ip-red rounded-full;

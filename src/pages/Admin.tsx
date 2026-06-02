@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Bell, Image as ImageIcon } from 'lucide-react';
 import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, serverTimestamp, query, orderBy, where, writeBatch, updateDoc } from 'firebase/firestore';
 import { formatDate, cn } from '../lib/utils';
+import { FormsManagement } from '../components/admin/FormsManagement';
 
 const ADMIN_EMAIL = 'teacherkalandi@gmail.com';
 
@@ -16,6 +17,7 @@ const TABS = [
   { id: 'news', name: 'Latest News', icon: Megaphone },
   { id: 'requests', name: 'Service Requests', icon: ClipboardList },
   { id: 'gallery', name: 'Photo Gallery', icon: ImageIcon },
+  { id: 'forms', name: 'Forms', icon: FilePlus },
 ];
 
 const CATEGORIES = [
@@ -130,6 +132,7 @@ export default function Admin() {
           {activeTab === 'news' && <NewsManagement key="news" />}
           {activeTab === 'requests' && <ServiceRequestDashboard key="reqs" />}
           {activeTab === 'gallery' && <GalleryManagement key="gallery" />}
+          {activeTab === 'forms' && <FormsManagement key="forms" />}
         </AnimatePresence>
       </main>
     </div>

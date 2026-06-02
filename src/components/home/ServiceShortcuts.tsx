@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { Search, Calculator, MapPin, Landmark, Banknote, UserCheck, Download, Pin, LogIn, PiggyBank, Percent, FileText, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Calculator, MapPin, Landmark, Banknote, UserCheck, Download, Pin, LogIn, PiggyBank, Percent, FileText, X, Link, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../lib/utils';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 
 const SHORTCUTS = [
   { name: 'Track Consignment', icon: Search, url: 'https://www.indiapost.gov.in/', color: 'text-ip-red' },
@@ -14,10 +16,29 @@ const SHORTCUTS = [
   { name: 'Digipin', icon: Pin, url: 'https://dac.indiapost.gov.in/mydigipin/home', color: 'text-orange-600' },
   { name: 'Customer Login', icon: LogIn, url: 'https://app.indiapost.gov.in/customer-selfservice/login', color: 'text-slate-600' },
   { name: 'Schedule Fees', icon: FileText, action: 'show-fees', color: 'text-[#8B0000]' },
+  { name: 'Forms', icon: Download, action: 'show-forms', color: 'text-purple-600' },
 ];
 
 export default function ServiceShortcuts() {
   const [showFees, setShowFees] = useState(false);
+  const [showForms, setShowForms] = useState(false);
+  const [forms, setForms] = useState<any[]>([]);
+  const [formSearchQuery, setFormSearchQuery] = useState('');
+
+  useEffect(() => {
+    if (showForms && forms.length === 0) {
+      const fetchForms = async () => {
+        try {
+          const q = query(collection(db, 'downloadable_forms'), orderBy('createdAt', 'desc'));
+          const snap = await getDocs(q);
+          setForms(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        } catch (err) {
+          console.error("Error fetching forms:", err);
+        }
+      };
+      fetchForms();
+    }
+  }, [showForms]);
 
   return (
     <section className="bg-gray-50 py-12">
@@ -31,6 +52,9 @@ export default function ServiceShortcuts() {
                 if (item.action === 'show-fees') {
                   e.preventDefault();
                   setShowFees(true);
+                } else if (item.action === 'show-forms') {
+                  e.preventDefault();
+                  setShowForms(true);
                 }
               }}
               target={item.url ? "_blank" : undefined}
@@ -101,6 +125,149 @@ export default function ServiceShortcuts() {
                   <span className="font-bold text-[#8B0000] not-italic">*</span>
                   <p>Tax as applicable on the above service charges shall also be payable</p>
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showForms && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowForms(false)}
+              className="absolute inset-0 bg-[#0f172a]/90 backdrop-blur-md cursor-pointer"
+            />
+            
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-5xl bg-[#0f172a] rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[90vh] flex flex-col border border-slate-800"
+            >
+              <div className="bg-[#b3262e] text-white p-5 flex justify-between items-center shrink-0 border-b border-black">
+                <h3 className="text-xl font-bold tracking-wide flex items-center gap-2">
+                  <Download size={22} /> Downloadable Forms
+                </h3>
+                <button 
+                  onClick={() => setShowForms(false)}
+                  className="p-1 rounded-full hover:bg-black/20 transition-colors cursor-pointer"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="px-4 pt-4 md:px-6 md:pt-6 shrink-0">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Search forms..."
+                    value={formSearchQuery}
+                    onChange={(e) => setFormSearchQuery(e.target.value)}
+                    className="w-full bg-[#1e293b] border border-[#334155] rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-[#475569] focus:ring-1 focus:ring-[#475569] transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="p-4 md:p-6 overflow-y-auto space-y-4 max-h-[550px] list-scrollbar">
+                {(() => {
+                  const filteredForms = forms.filter(f => 
+                    f.displayName?.toLowerCase().includes(formSearchQuery.toLowerCase()) || 
+                    f.description?.toLowerCase().includes(formSearchQuery.toLowerCase()) ||
+                    f.type?.toLowerCase().includes(formSearchQuery.toLowerCase())
+                  );
+
+                  if (forms.length === 0) {
+                    return (
+                      <div className="text-center p-8 text-slate-400">
+                        <Download className="mx-auto mb-4 opacity-50" size={32} />
+                        <p>No forms available.</p>
+                      </div>
+                    );
+                  }
+
+                  if (filteredForms.length === 0) {
+                    return (
+                      <div className="text-center p-8 text-slate-400">
+                        <Search className="mx-auto mb-4 opacity-50" size={32} />
+                        <p>No forms found matching "{formSearchQuery}".</p>
+                      </div>
+                    );
+                  }
+
+                  return filteredForms.map(form => {
+                    const dateObj = form.createdAt?.toDate ? form.createdAt.toDate() : new Date();
+                    const day = dateObj.getDate().toString().padStart(2, '0');
+                    const month = dateObj.toLocaleString('en-US', { month: 'short' });
+                    const year = dateObj.getFullYear().toString().slice(-2);
+                    const time = dateObj.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+
+                    return (
+                      <div key={form.id} className="flex flex-col md:flex-row bg-[#1e293b] border border-[#334155] rounded-xl overflow-hidden shadow-md group hover:border-[#475569] transition-colors">
+                        {/* Left split - Date */}
+                        <div className="bg-[#5c1c24] text-white p-4 md:w-36 flex flex-row md:flex-col items-center justify-center gap-2 md:gap-1 shrink-0 border-b md:border-b-0 md:border-r border-[#334155]">
+                          <div className="text-center font-black">
+                            <span className="text-3xl md:text-4xl block leading-none tracking-tight">{day}</span>
+                            <span className="text-[13px] md:text-sm tracking-wide mt-1 block opacity-90">{month} '{year}</span>
+                          </div>
+                          <div className="text-[10px] md:text-xs text-white/80 font-bold bg-black/20 px-2 py-0.5 rounded mt-1.5">{time}</div>
+                        </div>
+
+                        {/* Middle - Content */}
+                        <div className="p-4 md:p-5 flex-1 flex flex-col justify-center">
+                          <div className="mb-2">
+                            <span className="inline-block bg-[#4c1d95] text-indigo-100 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                              {form.type || 'GENERAL'}
+                            </span>
+                          </div>
+                          <h4 className="font-bold text-white text-base md:text-lg leading-snug">{form.displayName}</h4>
+                          {form.description && (
+                            <p className="text-slate-400 text-xs md:text-sm mt-1.5 leading-relaxed line-clamp-2">{form.description}</p>
+                          )}
+                        </div>
+
+                        {/* Right - Actions */}
+                        <div className="p-4 md:p-5 flex flex-row items-center justify-start md:justify-end gap-2.5 border-t md:border-t-0 md:border-l border-[#334155] shrink-0 bg-[#0f172a]/30">
+                          <a 
+                            href={form.uploadLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="flex items-center gap-2 px-4 py-2 bg-[#fde8e8] text-[#9b1c1c] hover:bg-white transition-colors font-bold text-sm rounded-lg shadow-sm"
+                          >
+                            <FileText size={16} />
+                            View PDF
+                          </a>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const text = `Check out this form: ${form.displayName}\nLink: ${form.uploadLink}`;
+                              window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                            }}
+                            className="p-2.5 bg-[#dcfce7] text-[#166534] hover:bg-[#bbf7d0] rounded-lg transition-colors cursor-pointer shadow-sm"
+                            title="Share on WhatsApp"
+                          >
+                            <MessageCircle size={18} />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              navigator.clipboard.writeText(form.uploadLink);
+                              alert("Link copied to clipboard");
+                            }}
+                            className="p-2.5 bg-[#dbeafe] text-[#1e40af] hover:bg-[#bfdbfe] rounded-lg transition-colors cursor-pointer shadow-sm"
+                            title="Copy Link"
+                          >
+                            <Link size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </motion.div>
           </div>
