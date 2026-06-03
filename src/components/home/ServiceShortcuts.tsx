@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Calculator, MapPin, Landmark, Banknote, UserCheck, Download, Pin, LogIn, PiggyBank, Percent, FileText, X, Link, MessageCircle } from 'lucide-react';
+import { Search, Calculator, MapPin, Landmark, Banknote, UserCheck, Download, Pin, LogIn, PiggyBank, Percent, FileText, X, Link, MessageCircle, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../lib/utils';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -14,6 +14,7 @@ const SHORTCUTS = [
   { name: 'IPPB', icon: Banknote, url: 'https://ippbonline.bank.in/en/web/ippb', color: 'text-indigo-600' },
   { name: 'Aadhaar Services', icon: UserCheck, url: 'https://uidai.gov.in/en/my-aadhaar/get-aadhaar.html', color: 'text-emerald-600' },
   { name: 'Digipin', icon: Pin, url: 'https://dac.indiapost.gov.in/mydigipin/home', color: 'text-orange-600' },
+  { name: 'Branch Office Directory', icon: Building2, url: 'https://bo-directory.vercel.app/', color: 'text-cyan-600' },
   { name: 'Customer Login', icon: LogIn, url: 'https://app.indiapost.gov.in/customer-selfservice/login', color: 'text-slate-600' },
   { name: 'Schedule Fees', icon: FileText, action: 'show-fees', color: 'text-[#8B0000]' },
   { name: 'Forms', icon: Download, action: 'show-forms', color: 'text-purple-600' },
@@ -43,7 +44,7 @@ export default function ServiceShortcuts() {
   return (
     <section className="bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-10 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center">
           {SHORTCUTS.map((item, i) => (
             <motion.a
               key={item.name}
