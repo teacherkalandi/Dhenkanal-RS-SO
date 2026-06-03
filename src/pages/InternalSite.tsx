@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CategoryCards from '../components/home/CategoryCards';
 import { motion, AnimatePresence } from 'motion/react';
-import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn } from 'lucide-react';
+import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { db } from '../lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -69,6 +69,15 @@ const OFFICIAL_LINKS = [
     color: 'bg-indigo-50 border-indigo-100 hover:border-indigo-300 text-indigo-900',
     iconBg: 'bg-indigo-500 text-white',
     themeColor: '#4f46e5',
+  },
+  {
+    name: 'Death Claim Settlement',
+    url: 'https://death-claim-settlement.vercel.app/',
+    description: 'Process and manage death claim settlements efficiently and securely.',
+    icon: FileCheck,
+    color: 'bg-teal-50 border-teal-100 hover:border-teal-300 text-teal-900',
+    iconBg: 'bg-teal-500 text-white',
+    themeColor: '#14b8a6',
   },
 ];
 
