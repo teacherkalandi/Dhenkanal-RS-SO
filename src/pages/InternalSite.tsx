@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CategoryCards from '../components/home/CategoryCards';
 import { motion, AnimatePresence } from 'motion/react';
-import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck } from 'lucide-react';
+import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { db } from '../lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -78,6 +78,15 @@ const OFFICIAL_LINKS = [
     color: 'bg-teal-50 border-teal-100 hover:border-teal-300 text-teal-900',
     iconBg: 'bg-teal-500 text-white',
     themeColor: '#14b8a6',
+  },
+  {
+    name: 'Finacle Assistant',
+    url: 'https://finacle-assistant.vercel.app/',
+    description: 'Assistant for managing Finacle core banking operations and queries.',
+    icon: Bot,
+    color: 'bg-cyan-50 border-cyan-100 hover:border-cyan-300 text-cyan-900',
+    iconBg: 'bg-cyan-500 text-white',
+    themeColor: '#06b6d4',
   },
 ];
 
