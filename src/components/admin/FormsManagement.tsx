@@ -74,14 +74,18 @@ export function FormsManagement() {
           <h3 className="font-black text-[#D8232A] uppercase tracking-widest text-xs">Upload New Form</h3>
           
           <div className="space-y-1">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Type (e.g., Savings, Checking)</label>
-            <input 
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Type</label>
+            <select 
               required 
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm text-gray-800 focus:ring-2 focus:ring-red-500"
-              placeholder="e.g. Account Opening"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none text-sm text-gray-800 focus:ring-2 focus:ring-red-500 appearance-none"
               value={formData.type}
               onChange={e => setFormData({...formData, type: e.target.value})}
-            />
+            >
+              <option value="" disabled>Select Type</option>
+              <option value="Savings">Savings</option>
+              <option value="PL/RPLI">PL/RPLI</option>
+              <option value="Others">Others</option>
+            </select>
           </div>
 
           <div className="space-y-1">

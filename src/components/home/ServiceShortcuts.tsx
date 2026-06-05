@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Calculator, MapPin, Landmark, Banknote, UserCheck, Download, Pin, LogIn, PiggyBank, Percent, FileText, X, Link, MessageCircle, Building2 } from 'lucide-react';
+import { Search, Calculator, MapPin, Landmark, Banknote, UserCheck, Download, Pin, LogIn, PiggyBank, Percent, FileText, X, Link, MessageCircle, Building2, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../lib/utils';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -25,6 +25,8 @@ export default function ServiceShortcuts() {
   const [showForms, setShowForms] = useState(false);
   const [forms, setForms] = useState<any[]>([]);
   const [formSearchQuery, setFormSearchQuery] = useState('');
+  const [formTypeFilter, setFormTypeFilter] = useState('All');
+  const [isDarkTheme, setIsDarkTheme] = useState(true);
 
   useEffect(() => {
     if (showForms && forms.length === 0) {
@@ -147,44 +149,70 @@ export default function ServiceShortcuts() {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-5xl bg-[#0f172a] rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[90vh] flex flex-col border border-slate-800"
+              className={`relative w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[90vh] flex flex-col border transition-colors duration-300 ${isDarkTheme ? 'bg-[#0f172a] border-slate-800' : 'bg-gray-50 border-gray-200'}`}
             >
-              <div className="bg-[#b3262e] text-white p-5 flex justify-between items-center shrink-0 border-b border-black">
+              <div className="bg-[#b3262e] text-white p-5 flex justify-between items-center shrink-0 border-b border-black shadow-md z-10">
                 <h3 className="text-xl font-bold tracking-wide flex items-center gap-2">
                   <Download size={22} /> Downloadable Forms
                 </h3>
-                <button 
-                  onClick={() => setShowForms(false)}
-                  className="p-1 rounded-full hover:bg-black/20 transition-colors cursor-pointer"
-                >
-                  <X size={24} />
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setIsDarkTheme(!isDarkTheme)}
+                    className="p-1.5 rounded-full hover:bg-black/20 transition-colors cursor-pointer"
+                    title={isDarkTheme ? "Switch to Light Theme" : "Switch to Dark Theme"}
+                  >
+                    {isDarkTheme ? <Sun size={20} /> : <Moon size={20} />}
+                  </button>
+                  <button 
+                    onClick={() => setShowForms(false)}
+                    className="p-1 rounded-full hover:bg-black/20 transition-colors cursor-pointer"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
               </div>
 
-              <div className="px-4 pt-4 md:px-6 md:pt-6 shrink-0">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                  <input
-                    type="text"
-                    placeholder="Search forms..."
-                    value={formSearchQuery}
-                    onChange={(e) => setFormSearchQuery(e.target.value)}
-                    className="w-full bg-[#1e293b] border border-[#334155] rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-[#475569] focus:ring-1 focus:ring-[#475569] transition-all"
-                  />
+              <div className="px-4 pt-4 md:px-6 md:pt-6 shrink-0 space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 ${isDarkTheme ? 'text-slate-400' : 'text-gray-400'}`} size={18} />
+                    <input
+                      type="text"
+                      placeholder="Search forms..."
+                      value={formSearchQuery}
+                      onChange={(e) => setFormSearchQuery(e.target.value)}
+                      className={`w-full rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-1 transition-all ${isDarkTheme ? 'bg-[#1e293b] border-[#334155] border text-white placeholder-slate-400 focus:border-[#475569] focus:ring-[#475569]' : 'bg-white border-gray-200 border text-gray-800 placeholder-gray-400 focus:border-red-400 focus:ring-red-400 shadow-sm'}`}
+                    />
+                  </div>
+                  
+                  <div className="shrink-0">
+                    <select
+                      value={formTypeFilter}
+                      onChange={(e) => setFormTypeFilter(e.target.value)}
+                      className={`w-full sm:w-48 appearance-none rounded-xl px-4 py-3 font-semibold focus:outline-none focus:ring-1 transition-all ${isDarkTheme ? 'bg-[#1e293b] border border-[#334155] text-white focus:border-[#475569] focus:ring-[#475569]' : 'bg-white border border-gray-200 text-gray-800 focus:border-red-400 focus:ring-red-400 shadow-sm'}`}
+                    >
+                      <option value="All">All Types</option>
+                      <option value="Savings">Savings</option>
+                      <option value="PL/RPLI">PL/RPLI</option>
+                      <option value="Others">Others</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
               <div className="p-4 md:p-6 overflow-y-auto space-y-4 max-h-[550px] list-scrollbar">
                 {(() => {
-                  const filteredForms = forms.filter(f => 
-                    f.displayName?.toLowerCase().includes(formSearchQuery.toLowerCase()) || 
-                    f.description?.toLowerCase().includes(formSearchQuery.toLowerCase()) ||
-                    f.type?.toLowerCase().includes(formSearchQuery.toLowerCase())
-                  );
+                  const filteredForms = forms.filter(f => {
+                    const matchesSearch = f.displayName?.toLowerCase().includes(formSearchQuery.toLowerCase()) || 
+                      f.description?.toLowerCase().includes(formSearchQuery.toLowerCase()) ||
+                      f.type?.toLowerCase().includes(formSearchQuery.toLowerCase());
+                    const matchesType = formTypeFilter === 'All' || f.type === formTypeFilter;
+                    return matchesSearch && matchesType;
+                  });
 
                   if (forms.length === 0) {
                     return (
-                      <div className="text-center p-8 text-slate-400">
+                      <div className={`text-center p-8 ${isDarkTheme ? 'text-slate-400' : 'text-gray-400'}`}>
                         <Download className="mx-auto mb-4 opacity-50" size={32} />
                         <p>No forms available.</p>
                       </div>
@@ -193,9 +221,9 @@ export default function ServiceShortcuts() {
 
                   if (filteredForms.length === 0) {
                     return (
-                      <div className="text-center p-8 text-slate-400">
+                      <div className={`text-center p-8 ${isDarkTheme ? 'text-slate-400' : 'text-gray-400'}`}>
                         <Search className="mx-auto mb-4 opacity-50" size={32} />
-                        <p>No forms found matching "{formSearchQuery}".</p>
+                        <p>No forms found matching your criteria.</p>
                       </div>
                     );
                   }
@@ -208,31 +236,31 @@ export default function ServiceShortcuts() {
                     const time = dateObj.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
                     return (
-                      <div key={form.id} className="flex flex-col md:flex-row bg-[#1e293b] border border-[#334155] rounded-xl overflow-hidden shadow-md group hover:border-[#475569] transition-colors">
+                      <div key={form.id} className={`flex flex-col md:flex-row rounded-xl overflow-hidden shadow-sm group transition-all duration-300 border ${isDarkTheme ? 'bg-[#1e293b] border-[#334155] hover:border-[#475569]' : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'}`}>
                         {/* Left split - Date */}
-                        <div className="bg-[#5c1c24] text-white p-4 md:w-36 flex flex-row md:flex-col items-center justify-center gap-2 md:gap-1 shrink-0 border-b md:border-b-0 md:border-r border-[#334155]">
+                        <div className={`p-4 md:w-36 flex flex-row md:flex-col items-center justify-center gap-2 md:gap-1 shrink-0 border-b md:border-b-0 md:border-r ${isDarkTheme ? 'bg-[#5c1c24] text-white border-[#334155]' : 'bg-[#fff1f2] text-[#8B0000] border-gray-100'}`}>
                           <div className="text-center font-black">
                             <span className="text-3xl md:text-4xl block leading-none tracking-tight">{day}</span>
                             <span className="text-[13px] md:text-sm tracking-wide mt-1 block opacity-90">{month} '{year}</span>
                           </div>
-                          <div className="text-[10px] md:text-xs text-white/80 font-bold bg-black/20 px-2 py-0.5 rounded mt-1.5">{time}</div>
+                          <div className={`text-[10px] md:text-xs font-bold px-2 py-0.5 rounded mt-1.5 ${isDarkTheme ? 'bg-black/20 text-white/80' : 'bg-red-100 text-red-800'}`}>{time}</div>
                         </div>
 
                         {/* Middle - Content */}
                         <div className="p-4 md:p-5 flex-1 flex flex-col justify-center">
                           <div className="mb-2">
-                            <span className="inline-block bg-[#4c1d95] text-indigo-100 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            <span className={`inline-block text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${isDarkTheme ? 'bg-[#4c1d95] text-indigo-100' : 'bg-indigo-100 text-indigo-800'}`}>
                               {form.type || 'GENERAL'}
                             </span>
                           </div>
-                          <h4 className="font-bold text-white text-base md:text-lg leading-snug">{form.displayName}</h4>
+                          <h4 className={`font-bold text-base md:text-lg leading-snug ${isDarkTheme ? 'text-white' : 'text-gray-900'}`}>{form.displayName}</h4>
                           {form.description && (
-                            <p className="text-slate-400 text-xs md:text-sm mt-1.5 leading-relaxed line-clamp-2">{form.description}</p>
+                            <p className={`text-xs md:text-sm mt-1.5 leading-relaxed line-clamp-2 ${isDarkTheme ? 'text-slate-400' : 'text-gray-500'}`}>{form.description}</p>
                           )}
                         </div>
 
                         {/* Right - Actions */}
-                        <div className="p-4 md:p-5 flex flex-row items-center justify-start md:justify-end gap-2.5 border-t md:border-t-0 md:border-l border-[#334155] shrink-0 bg-[#0f172a]/30">
+                        <div className={`p-4 md:p-5 flex flex-row items-center justify-start md:justify-end gap-2.5 border-t md:border-t-0 md:border-l shrink-0 ${isDarkTheme ? 'border-[#334155] bg-[#0f172a]/30' : 'border-gray-100 bg-gray-50'}`}>
                           <a 
                             href={form.uploadLink} 
                             target="_blank" 
