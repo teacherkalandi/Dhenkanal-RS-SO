@@ -387,23 +387,30 @@ function DocumentManagement() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="flex flex-col gap-3">
         {docs.map(doc => (
-          <div key={doc.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between h-64 group hover:shadow-xl transition-all">
-            <div>
-              <div className="flex justify-between items-start mb-4">
-                <span className="bg-red-50 text-[#D8232A] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">{doc.category}</span>
-                <button onClick={() => handleDelete(doc.id)} className="text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+          <div key={doc.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:shadow-md transition-all hover:border-red-100">
+            <div className="flex-1 flex flex-col md:flex-row md:items-center gap-4">
+              <div className="flex-shrink-0">
+                <span className="bg-red-50 text-[#D8232A] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter whitespace-nowrap">{doc.category}</span>
               </div>
-              <h4 className="font-bold text-gray-800 line-clamp-2 mb-2">{doc.title}</h4>
-              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">{doc.subCategory}</p>
+              <div className="flex-1">
+                <h4 className="font-bold text-gray-800 line-clamp-1">{doc.title}</h4>
+                <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mt-1 hidden md:block">{doc.subCategory}</p>
+              </div>
+              <div className="text-[10px] text-gray-400 md:w-32 md:text-right shrink-0">
+                {formatDate(doc.createdAt?.toDate ? doc.createdAt.toDate() : doc.createdAt)}
+              </div>
             </div>
-            <div className="pt-4 border-t flex items-center justify-between">
-               <p className="text-[10px] text-gray-400">{formatDate(doc.createdAt?.toDate ? doc.createdAt.toDate() : doc.createdAt)}</p>
-               <div className="flex gap-2">
-                 {doc.fileUrl && <a href={doc.fileUrl} className="p-2 bg-gray-50 rounded-lg text-gray-400 hover:text-red-600"><FileDown size={14} /></a>}
-                 {doc.externalLink && <a href={doc.externalLink} target="_blank" className="p-2 bg-gray-50 rounded-lg text-gray-400 hover:text-blue-600"><Eye size={14} /></a>}
-               </div>
+            
+            <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-2 border-t md:border-t-0 pt-3 md:pt-0 shrink-0">
+              <span className="text-[10px] uppercase font-black text-gray-400 tracking-widest mt-1 block md:hidden">{doc.subCategory}</span>
+              <div className="flex items-center gap-2">
+                {doc.fileUrl && <a href={doc.fileUrl} className="p-2 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 hover:text-[#D8232A] hover:bg-red-50 transition-colors"><FileDown size={16} /></a>}
+                {doc.externalLink && <a href={doc.externalLink} target="_blank" className="p-2 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><Eye size={16} /></a>}
+                <div className="w-[1px] h-6 bg-gray-200 mx-1 hidden md:block"></div>
+                <button onClick={() => handleDelete(doc.id)} className="p-2 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
+              </div>
             </div>
           </div>
         ))}

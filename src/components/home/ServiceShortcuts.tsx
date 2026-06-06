@@ -193,7 +193,7 @@ export default function ServiceShortcuts() {
                     >
                       <option value="All">All Types</option>
                       <option value="Savings">Savings</option>
-                      <option value="PL/RPLI">PL/RPLI</option>
+                      <option value="PLI/RPLI">PLI/RPLI</option>
                       <option value="Others">Others</option>
                     </select>
                   </div>
@@ -203,10 +203,13 @@ export default function ServiceShortcuts() {
               <div className="p-4 md:p-6 overflow-y-auto space-y-4 max-h-[550px] list-scrollbar">
                 {(() => {
                   const filteredForms = forms.filter(f => {
+                    const formTypeForSearch = (f.type === 'PL/RPLI' || f.type === 'PL/PLI') ? 'PLI/RPLI' : (f.type || '');
                     const matchesSearch = f.displayName?.toLowerCase().includes(formSearchQuery.toLowerCase()) || 
                       f.description?.toLowerCase().includes(formSearchQuery.toLowerCase()) ||
-                      f.type?.toLowerCase().includes(formSearchQuery.toLowerCase());
-                    const matchesType = formTypeFilter === 'All' || f.type === formTypeFilter;
+                      formTypeForSearch.toLowerCase().includes(formSearchQuery.toLowerCase());
+                    const matchesType = formTypeFilter === 'All' || 
+                      f.type === formTypeFilter || 
+                      (formTypeFilter === 'PLI/RPLI' && (f.type === 'PL/RPLI' || f.type === 'PL/PLI' || f.type === 'PLI/RPLI'));
                     return matchesSearch && matchesType;
                   });
 
@@ -250,7 +253,7 @@ export default function ServiceShortcuts() {
                         <div className="p-4 md:p-5 flex-1 flex flex-col justify-center">
                           <div className="mb-2">
                             <span className={`inline-block text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${isDarkTheme ? 'bg-[#4c1d95] text-indigo-100' : 'bg-indigo-100 text-indigo-800'}`}>
-                              {form.type || 'GENERAL'}
+                              {form.type === 'PL/RPLI' || form.type === 'PL/PLI' ? 'PLI/RPLI' : (form.type || 'GENERAL')}
                             </span>
                           </div>
                           <h4 className={`font-bold text-base md:text-lg leading-snug ${isDarkTheme ? 'text-white' : 'text-gray-900'}`}>{form.displayName}</h4>

@@ -26,7 +26,9 @@ import {
   IdCard,
   UserCheck,
   X,
-  Maximize2
+  Maximize2,
+  Package,
+  Wrench
 } from "lucide-react";
 import { formatDate, cn } from "../lib/utils";
 
@@ -57,192 +59,50 @@ const getGDrivePreviewUrl = (url?: string) => {
 const getDocTheme = (title: string, index: number) => {
   const normTitle = title.toLowerCase();
   
-  // 1. Deen Dayal SPARSH Yojana Notification (Blue)
-  if (normTitle.includes('deen dayal') || normTitle.includes('yojana notification') || (normTitle.includes('sparsh') && normTitle.includes('notification'))) {
-    return {
-      bgClass: 'bg-[#4B8BD2] bg-gradient-to-br from-[#4ea0e2] to-[#2e74af]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#4B8BD2]',
-      iconType: 'file-text',
-      themeColor: '#4B8BD2'
-    };
-  }
-  
-  // 2. SPARSH Application Form (Green)
-  if (normTitle.includes('application form') || normTitle.includes('form')) {
-    return {
-      bgClass: 'bg-[#40C373] bg-gradient-to-br from-[#50d383] to-[#30ab62]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#40C373]',
-      iconType: 'clipboard-list',
-      themeColor: '#40C373'
-    };
-  }
-  
-  // 3. Directorate Notification (Orange/Brown)
-  if (normTitle.includes('directorate')) {
-    return {
-      bgClass: 'bg-[#E17A2D] bg-gradient-to-br from-[#ea8c42] to-[#cb681e]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#E17A2D]',
-      iconType: 'megaphone',
-      themeColor: '#E17A2D'
-    };
-  }
-  
-  // 4. DDSY PPT (Red/Crimson)
-  if (normTitle.includes('ppt') || normTitle.includes('presentation')) {
-    return {
-      bgClass: 'bg-[#C0392B] bg-gradient-to-br from-[#d64a3b] to-[#a82518]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#C0392B]',
-      iconType: 'ppt',
-      themeColor: '#C0392B'
-    };
-  }
-  
-  // 5. SPARSH Applicant List (Purple)
-  if (normTitle.includes('applicant list') || normTitle.includes('applicants')) {
-    return {
-      bgClass: 'bg-[#9B59B6] bg-gradient-to-br from-[#af7ac5] to-[#884ea0]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#9B59B6]',
-      iconType: 'excel',
-      themeColor: '#9B59B6'
-    };
-  }
-  
-  // 6. Final List of Students for Exam (Teal)
-  if (normTitle.includes('final list') || normTitle.includes('eligible') || normTitle.includes('students for exam')) {
-    return {
-      bgClass: 'bg-[#2EAD95] bg-gradient-to-br from-[#3ac9b0] to-[#21907b]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#2EAD95]',
-      iconType: 'clipboard-check',
-      themeColor: '#2EAD95'
-    };
-  }
-  
-  // 7. Admit Cards (Dark Slate Blue)
-  if (normTitle.includes('admit card')) {
-    return {
-      bgClass: 'bg-[#34495e] bg-gradient-to-br from-[#3e5871] to-[#1e2b38]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#34495e]',
-      iconType: 'id-card',
-      themeColor: '#34495e'
-    };
-  }
-  
-  // 8. Students attendance sheet (Amber/Yellow)
-  if (normTitle.includes('attendance') || normTitle.includes('sheet')) {
-    return {
-      bgClass: 'bg-[#E1B12C] bg-gradient-to-br from-[#f1c40f] to-[#cfa020]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#E1B12C]',
-      iconType: 'user-check',
-      themeColor: '#E1B12C'
-    };
-  }
-  
-  // 9. SPARSH 2025 instructions (Purple-Green Gradient)
-  if (normTitle.includes('instructions') || normTitle.includes('guidelines')) {
-    return {
-      bgClass: 'bg-gradient-to-br from-[#9B59B6] to-[#27AE60]',
-      textColor: 'text-white',
-      descColor: 'text-white/80',
-      iconColor: 'bg-white text-[#9B59B6]',
-      iconType: 'id-card',
-      themeColor: '#9B59B6'
-    };
-  }
+  let iconType = 'file-text';
+  if (normTitle.includes('bag') || normTitle.includes('parcel')) iconType = 'package';
+  else if (normTitle.includes('report') || normTitle.includes('abstract')) iconType = 'clipboard-list';
+  else if (normTitle.includes('tool')) iconType = 'wrench';
+  else if (normTitle.includes('track')) iconType = 'search';
+  else if (normTitle.includes('ppt') || normTitle.includes('presentation')) iconType = 'ppt';
+  else if (normTitle.includes('list') || normTitle.includes('excel')) iconType = 'excel';
+  else if (normTitle.includes('form')) iconType = 'clipboard-list';
 
-  // Fallbacks
+  // Fallbacks mimicking the attached image (Blue, Purple, Teal, Red)
   const fallbacks = [
-    { bgClass: 'bg-[#4B8BD2] bg-gradient-to-br from-[#4ea0e2] to-[#2e74af]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'bg-white text-[#4B8BD2]', iconType: 'file-text', themeColor: '#4B8BD2' },
-    { bgClass: 'bg-[#40C373] bg-gradient-to-br from-[#50d383] to-[#30ab62]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'bg-white text-[#40C373]', iconType: 'clipboard-list', themeColor: '#40C373' },
-    { bgClass: 'bg-[#E17A2D] bg-gradient-to-br from-[#ea8c42] to-[#cb681e]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'bg-white text-[#E17A2D]', iconType: 'megaphone', themeColor: '#E17A2D' },
-    { bgClass: 'bg-[#C0392B] bg-gradient-to-br from-[#d64a3b] to-[#a82518]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'bg-white text-[#C0392B]', iconType: 'file-text', themeColor: '#C0392B' },
-    { bgClass: 'bg-[#9B59B6] bg-gradient-to-br from-[#af7ac5] to-[#884ea0]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'bg-white text-[#9B59B6]', iconType: 'excel', themeColor: '#9B59B6' },
+    { bgClass: 'bg-[#3b82f6]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'text-slate-600', iconType: iconType, themeColor: '#3b82f6' },
+    { bgClass: 'bg-[#8b5cf6]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'text-slate-600', iconType: iconType, themeColor: '#8b5cf6' },
+    { bgClass: 'bg-[#14b8a6]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'text-slate-600', iconType: iconType, themeColor: '#14b8a6' },
+    { bgClass: 'bg-[#ef4444]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'text-slate-600', iconType: iconType, themeColor: '#ef4444' },
+    { bgClass: 'bg-[#a855f7]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'text-slate-600', iconType: iconType, themeColor: '#a855f7' },
+    { bgClass: 'bg-[#2563eb]', textColor: 'text-white', descColor: 'text-white/80', iconColor: 'text-slate-600', iconType: iconType, themeColor: '#2563eb' },
   ];
   return fallbacks[index % fallbacks.length];
 };
 
 const DocIcon = ({ type, colorClass }: { type: string; colorClass: string }) => {
-  const baseClass = "w-16 h-16 md:w-20 md:h-20 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform";
+  const baseClass = "w-12 h-12 md:w-14 md:h-14 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform";
   
-  if (type === 'file-text') {
-    return (
-      <div className={baseClass}>
-        <FileText className={colorClass} size={28} />
-      </div>
-    );
-  }
-  if (type === 'clipboard-list') {
-    return (
-      <div className={baseClass}>
-        <ClipboardList className={colorClass} size={28} />
-      </div>
-    );
-  }
-  if (type === 'megaphone') {
-    return (
-      <div className={baseClass}>
-        <Megaphone className={colorClass} size={28} />
-      </div>
-    );
-  }
-  if (type === 'clipboard-check') {
-    return (
-      <div className={baseClass}>
-        <ClipboardCheck className={colorClass} size={28} />
-      </div>
-    );
-  }
-  if (type === 'id-card') {
-    return (
-      <div className={baseClass}>
-        <IdCard className={colorClass} size={28} />
-      </div>
-    );
-  }
-  if (type === 'user-check') {
-    return (
-      <div className={baseClass}>
-        <UserCheck className={colorClass} size={28} />
-      </div>
-    );
-  }
-  if (type === 'ppt') {
-    return (
-      <div className={baseClass}>
-        <div className="relative font-bold text-[#C0392B] text-xl md:text-2xl flex items-center justify-center">
-          P
-        </div>
-      </div>
-    );
-  }
-  if (type === 'excel') {
-    return (
-      <div className={baseClass}>
-        <div className="relative font-bold text-[#9B59B6] text-xl md:text-2xl flex items-center justify-center">
-          X
-        </div>
-      </div>
-    );
-  }
-  
+  const IconComponent = () => {
+    switch(type) {
+      case 'file-text': return <FileText className={colorClass} size={24} />;
+      case 'clipboard-list': return <ClipboardList className={colorClass} size={24} />;
+      case 'megaphone': return <Megaphone className={colorClass} size={24} />;
+      case 'clipboard-check': return <ClipboardCheck className={colorClass} size={24} />;
+      case 'id-card': return <IdCard className={colorClass} size={24} />;
+      case 'user-check': return <UserCheck className={colorClass} size={24} />;
+      case 'package': return <Package className={colorClass} size={24} />;
+      case 'wrench': return <Wrench className={colorClass} size={24} />;
+      case 'search': return <Search className={colorClass} size={24} />;
+      case 'ppt': return <div className={`font-bold ${colorClass} text-xl flex flex-col items-center justify-center`}>P</div>;
+      case 'excel': return <div className={`font-bold ${colorClass} text-xl flex flex-col items-center justify-center`}>X</div>;
+      default: return <FileText className={colorClass} size={24} />;
+    }
+  };
+
   return (
     <div className={baseClass}>
-      <FileText className={colorClass} size={28} />
+      <IconComponent />
     </div>
   );
 };
@@ -417,9 +277,9 @@ export default function CategoryPage() {
 
                     <div
                       className={cn(
-                        "gap-6",
+                        "gap-4 md:gap-6",
                         viewMode === "grid"
-                          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                          ? "grid grid-cols-1 lg:grid-cols-2"
                           : "flex flex-col",
                       )}
                     >
@@ -433,10 +293,9 @@ export default function CategoryPage() {
                             animate={{ opacity: 1, scale: 1 }}
                             onClick={() => setSelectedDocForPreview(doc)}
                             className={cn(
-                              "relative cursor-pointer select-none transition-all duration-300 hover:-translate-y-1.5 active:scale-[0.99] group flex flex-col justify-between overflow-hidden shadow-md hover:shadow-2xl",
-                              viewMode === "grid"
-                                ? cn("p-6 md:p-8 rounded-[2rem] h-52 md:h-56", cardTheme.bgClass)
-                                : cn("p-5 rounded-2xl md:flex-row md:items-center md:justify-between h-auto gap-4 md:gap-6 min-h-[105px]", cardTheme.bgClass)
+                              "relative cursor-pointer select-none transition-all duration-300 hover:shadow-lg active:scale-[0.99] group flex overflow-hidden shadow-sm border border-black/5 hover:-translate-y-1",
+                              "p-4 md:p-6 rounded-xl md:rounded-2xl items-center gap-4 md:gap-6 h-auto",
+                              cardTheme.bgClass
                             )}
                             style={{ 
                               background: cardTheme.bgClass.includes('gradient') 
@@ -448,28 +307,20 @@ export default function CategoryPage() {
                             id={`doc-card-${doc.id}`}
                           >
                             {/* Card Body */}
-                            <div className={cn("flex gap-5 md:gap-7 items-center h-full w-full", viewMode === "list" && "flex-row")}>
+                            <div className="flex gap-4 md:gap-6 items-center h-full w-full flex-row">
                               {/* Left Icon Panel */}
                               <DocIcon type={cardTheme.iconType} colorClass={cardTheme.iconColor} />
 
                               {/* Right Content Panel */}
-                              <div className="flex-1 min-w-0 text-white">
-                                <h4 className="font-extrabold text-white text-base md:text-xl mb-1.5 leading-tight tracking-tight uppercase line-clamp-2 md:line-clamp-3 group-hover:underline">
+                              <div className="flex-1 min-w-0 text-white flex flex-col justify-center">
+                                <h4 className="font-semibold text-white text-lg md:text-xl mb-1 leading-snug tracking-normal line-clamp-2">
                                   {doc.title}
                                 </h4>
-                                <p className="text-[11px] md:text-sm text-white/80 line-clamp-2 md:line-clamp-3 leading-relaxed font-medium">
-                                  {doc.description || "View this official document / notification."}
+                                <p className="text-[11px] md:text-sm text-white/90 line-clamp-1 md:line-clamp-2 leading-relaxed">
+                                  {doc.description || "Official document"}
                                 </p>
                               </div>
                             </div>
-
-                            {/* subtle action overlay helper at bottom-right in grid view */}
-                            {viewMode === "grid" && (
-                              <div className="absolute bottom-4 right-6 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all font-bold text-[9px] uppercase text-white tracking-widest bg-black/15 px-3 py-1.5 rounded-full backdrop-blur-md">
-                                <Eye size={12} />
-                                <span>Click to View</span>
-                              </div>
-                            )}
                           </motion.div>
                         );
                       })}
