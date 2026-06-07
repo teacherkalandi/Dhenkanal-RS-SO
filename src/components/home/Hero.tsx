@@ -20,7 +20,7 @@ const DEFAULT_SLIDES = [
   {
     title: 'Speed Post',
     subtitle: 'Fast and reliable delivery across the globe.',
-    image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifFTLOc7YSYPGakT0_3zn2RKfF1bW64PGF9xOokBJPPZdjY8g6WsmBw2EE_T_GQ34AVjhbUTaLzk9RhJR6WEamCcvvEXGiL6ETdXvmNLP5ix8gz-IgZANtNmKpD2EerbO_nzI7-q7f6E_-nVwFeXXPdPIJvVCxOWojMGBFwFEcrfLZ50maKs0EtaBtV0I/s1200/Revised-Blog-1.jpg',
+    image: 'https://share.google/UzxzBKQzFPHqWQigH',
     color: 'bg-maroon-900/40'
   },
   {
