@@ -91,7 +91,21 @@ service cloud.firestore {
           && data.createdAt is timestamp;
     }
 
+    function isValidHeroSlide(data) {
+      return data.keys().hasAll(['title', 'imageUrl', 'createdAt'])
+          && data.title is string
+          && data.imageUrl is string
+          && data.createdAt is timestamp;
+    }
+
     // --- COLLECTION RULES ---
+
+    match /hero_slides/{slideId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidHeroSlide(incoming()) && isValidId(slideId);
+      allow update: if isAdmin() && isValidHeroSlide(incoming());
+      allow delete: if isAdmin();
+    }
 
     match /downloadable_forms/{formId} {
       allow read: if true;

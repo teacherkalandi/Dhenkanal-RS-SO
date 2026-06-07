@@ -6,6 +6,7 @@ import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, Shi
 import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, serverTimestamp, query, orderBy, where, writeBatch, updateDoc } from 'firebase/firestore';
 import { formatDate, cn } from '../lib/utils';
 import { FormsManagement } from '../components/admin/FormsManagement';
+import { HeroSliderManagement } from '../components/admin/HeroSliderManagement';
 
 const ADMIN_EMAIL = 'teacherkalandi@gmail.com';
 
@@ -17,6 +18,7 @@ const TABS = [
   { id: 'news', name: 'Latest News', icon: Megaphone },
   { id: 'requests', name: 'Service Requests', icon: ClipboardList },
   { id: 'gallery', name: 'Photo Gallery', icon: ImageIcon },
+  { id: 'hero-slider', name: 'Hero Slider', icon: ImageIcon },
   { id: 'forms', name: 'Forms', icon: FilePlus },
 ];
 
@@ -132,6 +134,7 @@ export default function Admin() {
           {activeTab === 'news' && <NewsManagement key="news" />}
           {activeTab === 'requests' && <ServiceRequestDashboard key="reqs" />}
           {activeTab === 'gallery' && <GalleryManagement key="gallery" />}
+          {activeTab === 'hero-slider' && <HeroSliderManagement key="hero-slider" />}
           {activeTab === 'forms' && <FormsManagement key="forms" />}
         </AnimatePresence>
       </main>

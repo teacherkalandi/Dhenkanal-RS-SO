@@ -106,9 +106,25 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "category", "date", "createdAt"]
+    },
+    "HeroSlide": {
+      "title": "Hero Slide",
+      "description": "Extra hero slides shown on the homepage",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "imageUrl", "createdAt"]
     }
   },
   "firestore": {
+    "/hero_slides/{slideId}": {
+      "schema": "HeroSlide",
+      "description": "Custom hero slides shown on upper carousel."
+    },
     "/important_documents/{docId}": {
       "schema": "ImportantDocument",
       "description": "Collection of important documents shown on home page"
