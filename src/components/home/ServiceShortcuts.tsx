@@ -14,7 +14,6 @@ const SHORTCUTS = [
   { name: 'IPPB', icon: Banknote, url: 'https://ippbonline.bank.in/en/web/ippb', color: 'text-indigo-600' },
   { name: 'Aadhaar Services', icon: UserCheck, url: 'https://uidai.gov.in/en/my-aadhaar/get-aadhaar.html', color: 'text-emerald-600' },
   { name: 'Digipin', icon: Pin, url: 'https://dac.indiapost.gov.in/mydigipin/home', color: 'text-orange-600' },
-  { name: 'Branch Office Directory', icon: Building2, url: 'https://bo-directory.vercel.app/', color: 'text-cyan-600' },
   { name: 'Customer Login', icon: LogIn, url: 'https://app.indiapost.gov.in/customer-selfservice/login', color: 'text-slate-600' },
   { name: 'Schedule Fees', icon: FileText, action: 'show-fees', color: 'text-[#8B0000]' },
   { name: 'Forms', icon: Download, action: 'show-forms', color: 'text-purple-600' },

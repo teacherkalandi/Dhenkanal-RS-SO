@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CategoryCards from '../components/home/CategoryCards';
 import { motion, AnimatePresence } from 'motion/react';
-import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot } from 'lucide-react';
+import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot, Building2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { db } from '../lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -87,6 +87,15 @@ const OFFICIAL_LINKS = [
     color: 'bg-cyan-50 border-cyan-100 hover:border-cyan-300 text-cyan-900',
     iconBg: 'bg-cyan-500 text-white',
     themeColor: '#06b6d4',
+  },
+  {
+    name: 'Branch Office Directory',
+    url: 'https://bo-directory.vercel.app/',
+    description: 'Find and access detailed information about post branch offices and their specific locations.',
+    icon: Building2,
+    color: 'bg-slate-50 border-slate-100 hover:border-slate-300 text-slate-900',
+    iconBg: 'bg-slate-700 text-white',
+    themeColor: '#334155',
   },
 ];
 

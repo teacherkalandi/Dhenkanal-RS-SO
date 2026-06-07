@@ -20,7 +20,7 @@ const DEFAULT_SLIDES = [
   {
     title: 'Speed Post',
     subtitle: 'Fast and reliable delivery across the globe.',
-    image: 'https://share.google/UzxzBKQzFPHqWQigH',
+    image: 'https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/Professional%20Business%20Email.jpg?tx=w_responsive:fallback-max-width_1282;fallback-max-width-mobile_720',
     color: 'bg-maroon-900/40'
   },
   {
