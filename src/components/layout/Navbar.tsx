@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Globe, Calendar, Clock, ChevronDown, User, LogOut, Home, Briefcase, PlusCircle, LayoutDashboard, Search, FileText, HelpCircle, Phone, Info } from 'lucide-react';
+import { Menu, X, Globe, Calendar, Clock, ChevronDown, User, LogOut, Home, Briefcase, PlusCircle, LayoutDashboard, Search, FileText, HelpCircle, Phone, Info, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/utils';
@@ -34,6 +34,20 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
 
+  const [isDark, setIsDark] = useState(() => {
+    return document.body.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
+
   useEffect(() => {
     const timer = setInterval(() => setDateTime(new Date()), 1000);
     const unsubscribe = onAuthStateChanged(auth, (user) => setUser(user));
@@ -43,14 +57,34 @@ export default function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    // Inject Google Translate script if not present
+    if (!document.getElementById('google-translate-script')) {
+      const addScript = document.createElement('script');
+      addScript.setAttribute('src', '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit');
+      addScript.id = 'google-translate-script';
+      document.body.appendChild(addScript);
+
+      // @ts-ignore
+      window.googleTranslateElementInit = () => {
+        // @ts-ignore
+        new window.google.translate.TranslateElement({
+          pageLanguage: 'en',
+          includedLanguages: 'hi,en,bn,te,mr,ta,gu,kn,ml,pa,or',
+        }, 'google_translate_element');
+      };
+    }
+  }, []);
+
   return (
     <header className="w-full relative z-50">
       {/* 1. Utility Bar */}
       <div className="bg-[#1a0204] border-b border-white/5 text-red-100/70 py-1.5 px-6 text-[11px] flex justify-between items-center overflow-x-auto whitespace-nowrap scrollbar-hide">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
-            <Globe size={12} />
-            <span className="font-medium">🌐 English / हिन्दी</span>
+          <div className="flex items-center gap-1.5 min-w-[120px]">
+            <Globe size={12} className="text-white/70" />
+            <span className="font-medium text-white/70 uppercase tracking-widest text-[10px] mr-1 hidden sm:inline">Language:</span>
+            <div id="google_translate_element"></div>
           </div>
           <div className="flex items-center gap-4 border-l border-white/10 pl-4">
              <span className="flex items-center gap-1.5 text-white/90">
@@ -68,6 +102,16 @@ export default function Navbar() {
           <span className="cursor-pointer hover:text-white transition-colors">A</span>
           <span className="cursor-pointer hover:text-white transition-colors">A+</span>
           <span className="border-l border-white/10 pl-4 cursor-pointer hover:text-white transition-colors">Screen Reader</span>
+          <div className="border-l border-white/10 pl-4 flex items-center">
+            <button 
+              onClick={() => setIsDark(!isDark)}
+              className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDark ? <Sun size={12} className="text-amber-400" /> : <Moon size={12} className="text-slate-300" />}
+              {isDark ? 'LIGHT THEME' : 'DARK THEME'}
+            </button>
+          </div>
         </div>
       </div>
 

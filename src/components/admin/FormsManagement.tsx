@@ -83,7 +83,7 @@ export function FormsManagement() {
             >
               <option value="" disabled>Select Type</option>
               <option value="Savings">Savings</option>
-              <option value="PLI/RPLI">PLI/RPLI</option>
+              <option value="PLI/RPLI" className="notranslate">PLI/RPLI</option>
               <option value="Others">Others</option>
             </select>
           </div>
@@ -145,7 +145,7 @@ export function FormsManagement() {
               {forms.map(formItem => (
                 <div key={formItem.id} className="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 flex items-start justify-between group">
                   <div className="flex-1 pr-4">
-                    <p className="text-[10px] uppercase font-black text-[#D8232A] mb-1">{formItem.type === 'PL/RPLI' || formItem.type === 'PL/PLI' ? 'PLI/RPLI' : formItem.type}</p>
+                    <p className="text-[10px] uppercase font-black text-[#D8232A] mb-1 notranslate">{formItem.type === 'PL/RPLI' || formItem.type === 'PL/PLI' ? 'PLI/RPLI' : formItem.type}</p>
                     <p className="text-sm font-bold text-gray-800 leading-snug">{formItem.displayName}</p>
                     {formItem.description && (
                       <p className="text-xs text-gray-500 mt-1 line-clamp-2">{formItem.description}</p>

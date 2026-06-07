@@ -13,7 +13,27 @@
 
 @layer base {
   body {
-    @apply bg-[#f8f9fa] text-slate-800;
+    @apply bg-[#f8f9fa] text-slate-800 transition-colors duration-300;
+  }
+  
+  /* Global Dark Mode Mappings */
+  body.dark {
+    @apply bg-[#0f172a] text-slate-100;
+  }
+  body.dark .bg-white {
+    @apply !bg-[#1e293b] !border-[#334155];
+  }
+  body.dark .bg-gray-50, body.dark .bg-slate-50, body.dark .bg-slate-100 {
+    @apply !bg-[#0f172a] !border-[#334155];
+  }
+  body.dark .text-slate-800, body.dark .text-gray-800, body.dark .text-gray-700, body.dark .text-gray-900, body.dark .text-slate-900 {
+    @apply !text-slate-100;
+  }
+  body.dark .text-gray-600, body.dark .text-gray-500, body.dark .text-slate-600, body.dark .text-slate-500 {
+    @apply !text-slate-300;
+  }
+  body.dark .border-gray-100, body.dark .border-gray-200, body.dark .border-slate-100, body.dark .border-slate-200 {
+    @apply !border-[#334155];
   }
 }
 
@@ -45,3 +65,44 @@
     @apply h-8 w-1.5 bg-ip-red rounded-full;
   }
 }
+
+/* Google Translate Styling Overrides */
+.goog-te-gadget {
+  font-size: 0px !important; /* Hides "Powered by" text */
+  color: transparent !important;
+  display: flex !important;
+  align-items: center;
+}
+.goog-te-gadget img {
+  display: none !important; /* Hide Google logo */
+}
+.goog-te-combo {
+  background-color: transparent !important;
+  color: rgba(254, 226, 226, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px;
+  padding: 2px 6px !important;
+  font-size: 11px !important;
+  font-family: inherit !important;
+  outline: none !important;
+  cursor: pointer;
+  margin: 0 !important;
+}
+.goog-te-combo:hover, .goog-te-combo:focus {
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+.goog-te-combo option {
+  background-color: #1a0204;
+  color: white;
+}
+body {
+  top: 0 !important; /* prevent google translate from pushing down the page */
+}
+.VIpgJd-ZVi9od-ORHb-OEVmcd {
+  display: none !important; /* Hide google translate banner frame */
+}
+.skiptranslate.goog-te-gadget > span {
+  display: none !important; /* Hides internal wrapper with extra text */
+}
+

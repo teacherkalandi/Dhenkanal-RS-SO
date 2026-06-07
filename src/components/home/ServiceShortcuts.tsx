@@ -193,7 +193,7 @@ export default function ServiceShortcuts() {
                     >
                       <option value="All">All Types</option>
                       <option value="Savings">Savings</option>
-                      <option value="PLI/RPLI">PLI/RPLI</option>
+                      <option value="PLI/RPLI" className="notranslate">PLI/RPLI</option>
                       <option value="Others">Others</option>
                     </select>
                   </div>
@@ -252,7 +252,7 @@ export default function ServiceShortcuts() {
                         {/* Middle - Content */}
                         <div className="p-4 md:p-5 flex-1 flex flex-col justify-center">
                           <div className="mb-2">
-                            <span className={`inline-block text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${isDarkTheme ? 'bg-[#4c1d95] text-indigo-100' : 'bg-indigo-100 text-indigo-800'}`}>
+                            <span className={`inline-block text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${isDarkTheme ? 'bg-[#4c1d95] text-indigo-100' : 'bg-indigo-100 text-indigo-800'} notranslate`}>
                               {form.type === 'PL/RPLI' || form.type === 'PL/PLI' ? 'PLI/RPLI' : (form.type || 'GENERAL')}
                             </span>
                           </div>

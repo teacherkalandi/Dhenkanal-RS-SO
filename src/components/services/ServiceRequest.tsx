@@ -90,7 +90,7 @@ export default function ServiceRequest({ hideHeader = false }: { hideHeader?: bo
             <div className="w-12 h-12 md:w-24 md:h-24 bg-slate-50 rounded-2xl md:rounded-3xl flex items-center justify-center text-ip-maroon mb-4 md:mb-8 group-hover:bg-ip-red group-hover:text-white transition-all shadow-sm">
               <service.icon size={24} className="md:w-[44px] md:h-[44px]" />
             </div>
-            <h3 className="font-black text-center text-slate-800 uppercase tracking-tight text-[10px] md:text-sm leading-tight flex-grow">{service.name}</h3>
+            <h3 className="font-black text-center text-slate-800 uppercase tracking-tight text-[10px] md:text-sm leading-tight flex-grow notranslate">{service.name}</h3>
             <div className="mt-4 md:mt-6 flex items-center gap-2 md:gap-3 text-[8px] md:text-[11px] font-black text-ip-red uppercase tracking-widest border-t border-slate-50 pt-3 md:pt-4 w-full justify-center">
               <span>Request</span>
               <Send size={10} className="md:w-[14px] md:h-[14px] group-hover:translate-x-1 transition-transform" />
