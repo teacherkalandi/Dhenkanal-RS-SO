@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CategoryCards from '../components/home/CategoryCards';
 import { motion, AnimatePresence } from 'motion/react';
-import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot, Building2 } from 'lucide-react';
+import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot, Building2, Receipt } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { db } from '../lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -96,6 +96,15 @@ const OFFICIAL_LINKS = [
     color: 'bg-slate-50 border-slate-100 hover:border-slate-300 text-slate-900',
     iconBg: 'bg-slate-700 text-white',
     themeColor: '#334155',
+  },
+  {
+    name: 'TD Bill Generator',
+    url: 'https://td-commission-bill-generator.vercel.app/',
+    description: 'Generate TD commission bills automatically.',
+    icon: Receipt,
+    color: 'bg-emerald-50 border-emerald-100 hover:border-emerald-300 text-emerald-900',
+    iconBg: 'bg-emerald-600 text-white',
+    themeColor: '#059669',
   },
 ];
 
