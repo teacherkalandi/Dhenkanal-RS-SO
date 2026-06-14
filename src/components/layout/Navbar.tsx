@@ -25,6 +25,7 @@ const OTHERS_LINKS = [
   { name: 'Staff Site', url: 'https://staffsite-dklrs.vercel.app/' },
   { name: 'Dhenkanal RS SO Site', url: 'https://sites.google.com/view/dhenkanalrsso/home?authuser=3' },
   { name: 'Forms and Downloads', url: 'https://indiapost-repository.vercel.app/' },
+  { name: 'Dakshiksha', url: 'https://dakshiksha.netlify.app/' },
 ];
 
 export default function Navbar() {
