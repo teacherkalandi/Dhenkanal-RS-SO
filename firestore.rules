@@ -98,7 +98,19 @@ service cloud.firestore {
           && data.createdAt is timestamp;
     }
 
+    function isValidCustomApp(data) {
+      return data.title is string
+          && data.htmlCode is string;
+    }
+
     // --- COLLECTION RULES ---
+
+    match /custom_apps/{appId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidCustomApp(incoming()) && isValidId(appId);
+      allow update: if isAdmin() && isValidCustomApp(incoming());
+      allow delete: if isAdmin();
+    }
 
     match /hero_slides/{slideId} {
       allow read: if true;

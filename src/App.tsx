@@ -7,6 +7,8 @@ import CategoryPage from './pages/CategoryPage';
 import ServiceRequest from './components/services/ServiceRequest';
 import Admin from './pages/Admin';
 import InternalSite from './pages/InternalSite';
+import CustomAppPage from './pages/CustomAppPage';
+import MyAppsPage from './pages/MyAppsPage';
 import { db } from './lib/firebase';
 import { doc, updateDoc, increment, setDoc, getDoc } from 'firebase/firestore';
 
@@ -44,6 +46,8 @@ export default function App() {
             <Route path="/services" element={<ServiceRequest />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/internal-site" element={<InternalSite />} />
+            <Route path="/my-apps" element={<MyAppsPage />} />
+            <Route path="/my-apps/:id" element={<CustomAppPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

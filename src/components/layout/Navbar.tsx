@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Globe, Calendar, Clock, ChevronDown, User, LogOut, Home, Briefcase, PlusCircle, LayoutDashboard, Search, FileText, HelpCircle, Phone, Info, Sun, Moon } from 'lucide-react';
+import { Menu, X, Globe, Calendar, Clock, ChevronDown, User, LogOut, Home, Briefcase, PlusCircle, LayoutDashboard, Search, FileText, HelpCircle, Phone, Info, Sun, Moon, Code } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/utils';
-import { auth, signInWithGoogle } from '../../lib/firebase';
+import { auth, signInWithGoogle, db } from '../../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 
 const NAVIGATION = [
   { name: 'Home', path: '/', icon: Home },
@@ -15,8 +16,7 @@ const NAVIGATION = [
 ];
 
 const OTHERS_LINKS = [
-  { name: 'Customer Login', url: 'https://app.indiapost.gov.in/customer-selfservice/login' },
-  { name: 'Track Consignment', url: 'https://www.indiapost.gov.in/' },
+  { name: 'My Apps', path: '/my-apps', isInternal: true },
   { name: 'APT 2.0', url: 'https://app.indiapost.gov.in/employeeportal' },
   { name: 'India Post Official', url: 'https://www.indiapost.gov.in/' },
   { name: 'Dhenkanal Postal Division', url: 'https://dhenkanalpostaldivision.org/' },
@@ -166,7 +166,7 @@ export default function Navbar() {
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className={cn(
                       "px-6 h-12 text-[12px] font-bold text-white flex items-center gap-2 transition-all hover:bg-black/10",
-                      dropdownOpen && "bg-black/20"
+                      dropdownOpen ? "bg-black/20" : ""
                     )}
                   >
                     {item.name.toUpperCase()}
@@ -196,15 +196,25 @@ export default function Navbar() {
                         onMouseLeave={() => setDropdownOpen(false)}
                       >
                         {OTHERS_LINKS.map(link => (
-                          <a 
-                            key={link.name} 
-                            href={link.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block px-6 py-4 text-[11px] font-bold text-slate-700 hover:bg-slate-50 hover:text-ip-red uppercase tracking-wide transition-colors"
-                          >
-                            {link.name}
-                          </a>
+                          link.isInternal ? (
+                            <Link 
+                              key={link.name} 
+                              to={link.path!} 
+                              className="block px-6 py-4 text-[11px] font-bold text-slate-700 hover:bg-slate-50 hover:text-ip-red uppercase tracking-wide transition-colors"
+                            >
+                              {link.name}
+                            </Link>
+                          ) : (
+                            <a 
+                              key={link.name} 
+                              href={link.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="block px-6 py-4 text-[11px] font-bold text-slate-700 hover:bg-slate-50 hover:text-ip-red uppercase tracking-wide transition-colors"
+                            >
+                              {link.name}
+                            </a>
+                          )
                         ))}
                       </motion.div>
                     )}
@@ -251,16 +261,28 @@ export default function Navbar() {
                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">External Links</p>
                  <div className="grid grid-cols-1 gap-3">
                   {OTHERS_LINKS.map(link => (
-                    <a 
-                      key={link.name} 
-                      href={link.url} 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-bold text-slate-700 hover:text-[#D8232A] flex items-center gap-2"
-                    >
-                      <Globe size={14} className="text-slate-300" />
-                      {link.name}
-                    </a>
+                    link.isInternal ? (
+                      <Link 
+                        key={link.name} 
+                        to={link.path!} 
+                        onClick={() => setIsOpen(false)}
+                        className="text-sm font-bold text-slate-700 hover:text-[#D8232A] flex items-center gap-2"
+                      >
+                        <Globe size={14} className="text-slate-300" />
+                        {link.name}
+                      </Link>
+                    ) : (
+                      <a 
+                        key={link.name} 
+                        href={link.url} 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-bold text-slate-700 hover:text-[#D8232A] flex items-center gap-2"
+                      >
+                        <Globe size={14} className="text-slate-300" />
+                        {link.name}
+                      </a>
+                    )
                   ))}
                  </div>
               </div>

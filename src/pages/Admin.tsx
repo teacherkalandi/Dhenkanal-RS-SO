@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { auth, signInWithGoogle, db } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Bell, Image as ImageIcon } from 'lucide-react';
+import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Bell, Image as ImageIcon, Code } from 'lucide-react';
 import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, serverTimestamp, query, orderBy, where, writeBatch, updateDoc } from 'firebase/firestore';
 import { formatDate, cn } from '../lib/utils';
 import { FormsManagement } from '../components/admin/FormsManagement';
 import { HeroSliderManagement } from '../components/admin/HeroSliderManagement';
+import { CustomAppsManagement } from '../components/admin/CustomAppsManagement';
 
 const ADMIN_EMAIL = 'teacherkalandi@gmail.com';
 
@@ -20,6 +21,7 @@ const TABS = [
   { id: 'gallery', name: 'Photo Gallery', icon: ImageIcon },
   { id: 'hero-slider', name: 'Hero Slider', icon: ImageIcon },
   { id: 'forms', name: 'Forms', icon: FilePlus },
+  { id: 'custom-apps', name: 'My Apps', icon: Code },
 ];
 
 const CATEGORIES = [
@@ -136,6 +138,7 @@ export default function Admin() {
           {activeTab === 'gallery' && <GalleryManagement key="gallery" />}
           {activeTab === 'hero-slider' && <HeroSliderManagement key="hero-slider" />}
           {activeTab === 'forms' && <FormsManagement key="forms" />}
+          {activeTab === 'custom-apps' && <CustomAppsManagement key="custom-apps" />}
         </AnimatePresence>
       </main>
     </div>
