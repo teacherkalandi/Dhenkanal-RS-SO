@@ -88,30 +88,42 @@ export default function MyAppsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredApps.map((app, i) => (
-                <motion.div
-                  key={app.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05, duration: 0.5 }}
-                >
-                  <Link 
-                    to={`/my-apps/${app.id}`}
-                    className="block bg-white rounded-[1.5rem] border border-gray-200 hover:border-red-200 overflow-hidden shadow-sm hover:shadow-md transition-all group"
+              {filteredApps.map((app, i) => {
+                const colors = [
+                  { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100/50', hoverBorder: 'hover:border-blue-200', hoverText: 'group-hover:text-blue-600' },
+                  { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100/50', hoverBorder: 'hover:border-emerald-200', hoverText: 'group-hover:text-emerald-600' },
+                  { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-100/50', hoverBorder: 'hover:border-purple-200', hoverText: 'group-hover:text-purple-600' },
+                  { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100/50', hoverBorder: 'hover:border-amber-200', hoverText: 'group-hover:text-amber-600' },
+                  { bg: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-100/50', hoverBorder: 'hover:border-rose-200', hoverText: 'group-hover:text-rose-600' },
+                  { bg: 'bg-cyan-50', text: 'text-cyan-600', border: 'border-cyan-100/50', hoverBorder: 'hover:border-cyan-200', hoverText: 'group-hover:text-cyan-600' },
+                ];
+                const theme = colors[i % colors.length];
+
+                return (
+                  <motion.div
+                    key={app.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.05, duration: 0.5 }}
                   >
-                    <div className="h-44 flex items-center justify-center bg-white">
-                      <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm border border-red-100/50">
-                        <AppWindow size={32} className="text-[#D8232A]" />
+                    <Link 
+                      to={`/my-apps/${app.id}`}
+                      className={`block bg-white rounded-[1.5rem] border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all group ${theme.hoverBorder}`}
+                    >
+                      <div className="h-44 flex items-center justify-center bg-white">
+                        <div className={`w-20 h-20 rounded-full ${theme.bg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm border ${theme.border}`}>
+                          <AppWindow size={32} className={theme.text} />
+                        </div>
                       </div>
-                    </div>
-                    <div className="bg-slate-50/80 border-t border-gray-100 p-5 flex items-center justify-between">
-                      <span className="font-bold text-[#1E293B] text-base truncate pr-4">{app.title}</span>
-                      <ChevronRight size={20} className="text-[#94A3B8] group-hover:text-[#D8232A] transition-colors flex-shrink-0" />
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
+                      <div className="bg-slate-50/80 border-t border-gray-100 p-5 flex items-center justify-between">
+                        <span className="font-bold text-[#1E293B] text-base truncate pr-4">{app.title}</span>
+                        <ChevronRight size={20} className={`text-[#94A3B8] transition-colors flex-shrink-0 ${theme.hoverText}`} />
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </section>

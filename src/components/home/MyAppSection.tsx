@@ -34,27 +34,39 @@ export default function MyAppSection() {
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
-        {apps.map((app, i) => (
-          <motion.div
-            key={app.id}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.05, duration: 0.5 }}
-          >
-            <Link 
-              to={`/my-apps/${app.id}`}
-              className={`group bg-white border border-gray-100 h-44 md:h-52 rounded-3xl p-6 flex flex-col items-center justify-center text-center transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:-translate-y-2 hover:border-red-100 relative overflow-hidden`}
+        {apps.map((app, i) => {
+          const colors = [
+            { bg: 'bg-blue-500', shadow: 'shadow-blue-500/20', hoverBorder: 'hover:border-blue-200', overlay: 'bg-blue-50/10' },
+            { bg: 'bg-emerald-500', shadow: 'shadow-emerald-500/20', hoverBorder: 'hover:border-emerald-200', overlay: 'bg-emerald-50/10' },
+            { bg: 'bg-purple-500', shadow: 'shadow-purple-500/20', hoverBorder: 'hover:border-purple-200', overlay: 'bg-purple-50/10' },
+            { bg: 'bg-amber-500', shadow: 'shadow-amber-500/20', hoverBorder: 'hover:border-amber-200', overlay: 'bg-amber-50/10' },
+            { bg: 'bg-rose-500', shadow: 'shadow-rose-500/20', hoverBorder: 'hover:border-rose-200', overlay: 'bg-rose-50/10' },
+            { bg: 'bg-cyan-500', shadow: 'shadow-cyan-500/20', hoverBorder: 'hover:border-cyan-200', overlay: 'bg-cyan-50/10' },
+          ];
+          const theme = colors[i % colors.length];
+
+          return (
+            <motion.div
+              key={app.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05, duration: 0.5 }}
             >
-              <div className={`bg-red-500 p-4 rounded-2xl text-white mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-black/5`}>
-                <Code size={24} />
-              </div>
-              <span className="font-black text-[13px] text-slate-700 uppercase tracking-tight leading-snug">{app.title}</span>
-              
-              <div className="absolute inset-0 bg-red-50/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-            </Link>
-          </motion.div>
-        ))}
+              <Link 
+                to={`/my-apps/${app.id}`}
+                className={`group bg-white border border-gray-100 h-44 md:h-52 rounded-3xl p-6 flex flex-col items-center justify-center text-center transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:-translate-y-2 ${theme.hoverBorder} relative overflow-hidden`}
+              >
+                <div className={`${theme.bg} p-4 rounded-2xl text-white mb-4 group-hover:scale-110 transition-transform shadow-lg ${theme.shadow}`}>
+                  <Code size={24} />
+                </div>
+                <span className="font-black text-[13px] text-slate-700 uppercase tracking-tight leading-snug">{app.title}</span>
+                
+                <div className={`absolute inset-0 ${theme.overlay} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />
+              </Link>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );
