@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Hero from '../components/home/Hero';
 import NewsMarquee from '../components/home/NewsMarquee';
 import ServiceShortcuts from '../components/home/ServiceShortcuts';
-import MyAppSection from '../components/home/MyAppSection';
 import ServiceRequest from '../components/services/ServiceRequest';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapPin, Mail, ArrowRight, FileText, Bell, Loader2, ZoomIn, Calendar, Image as ImageIcon, X } from 'lucide-react';
@@ -421,9 +420,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* My Apps Section */}
-      <MyAppSection />
 
       {/* About Section */}
       <section className="max-w-7xl mx-auto px-4 py-20 bg-white rounded-[3rem] shadow-sm border border-gray-50 mb-20">
