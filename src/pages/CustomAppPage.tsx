@@ -55,33 +55,28 @@ export default function CustomAppPage() {
   }
 
   return (
-    <div className="max-w-7xl w-full mx-auto p-4 md:p-8 pt-8 md:pt-12">
-      <div className="mb-6">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-red-600 transition-colors uppercase tracking-widest bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+    <div className="w-full min-h-screen bg-gray-50 flex flex-col">
+      <div className="p-4 bg-white shadow-sm flex items-center justify-between border-b border-gray-100 z-10 shrink-0">
+        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#D8232A] transition-colors uppercase tracking-widest bg-gray-50 px-4 py-2 rounded-xl">
           <ArrowLeft size={16} />
           Back to Home
         </Link>
+        <h1 className="text-lg md:text-xl font-black text-gray-900 tracking-tight truncate px-4">{appData.title}</h1>
+        <div className="w-[120px] hidden md:block"></div>
       </div>
       
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-[2rem] shadow-xl border border-gray-100 p-6 md:p-12 min-h-[60vh] overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex-1 w-full bg-white relative flex flex-col"
       >
-        <div className="mb-10 text-center">
-           <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">{appData.title}</h1>
-           <div className="w-24 h-1.5 bg-[#D8232A] rounded-full mx-auto mt-6" />
-        </div>
-
-        <div className="w-full h-[800px] border border-gray-100 rounded-2xl overflow-hidden bg-gray-50/50">
-          <iframe 
-            title={appData.title}
-            srcDoc={appData.htmlCode}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            className="w-full h-full border-none"
-            style={{ minHeight: '800px' }}
-          />
-        </div>
+        <iframe 
+          title={appData.title}
+          srcDoc={appData.htmlCode}
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          className="flex-1 w-full h-full border-none"
+          style={{ minHeight: 'calc(100vh - 73px)' }}
+        />
       </motion.div>
     </div>
   );
