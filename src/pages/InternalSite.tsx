@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import CategoryCards from '../components/home/CategoryCards';
 import { motion, AnimatePresence } from 'motion/react';
-import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot, Building2, Receipt } from 'lucide-react';
+import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot, Building2, Receipt, AppWindow } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { db } from '../lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 const OFFICIAL_LINKS = [
+  {
+    name: 'IndiaPost Apps Portal',
+    url: 'https://indiapost-apps.vercel.app/',
+    description: 'Access a curated collection of official applications and tools.',
+    icon: AppWindow,
+    color: 'bg-rose-50 border-rose-100 hover:border-rose-300 text-rose-900',
+    iconBg: 'bg-rose-500 text-white',
+    themeColor: '#f43f5e',
+  },
   {
     name: 'PMV Ticket Raise',
     url: 'https://pmv-toolkit.vercel.app/',
