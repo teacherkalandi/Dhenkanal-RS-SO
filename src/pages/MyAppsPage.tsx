@@ -18,7 +18,23 @@ export default function MyAppsPage() {
       try {
         const q = query(collection(db, 'custom_apps'), orderBy('createdAt', 'desc'));
         const snap = await getDocs(q);
-        setApps(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        
+        const fetchedApps = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Auto-migrate legacy categories to PLI/RPLI
+        fetchedApps.forEach(async (app) => {
+          if (app.category === 'More' || app.category === 'More/More') {
+            try {
+              const { updateDoc, doc } = await import('firebase/firestore');
+              await updateDoc(doc(db, 'custom_apps', app.id), { category: 'PLI/RPLI' });
+              app.category = 'PLI/RPLI';
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        });
+
+        setApps(fetchedApps);
       } catch (error) {
         console.error('Error fetching My Apps:', error);
       } finally {
