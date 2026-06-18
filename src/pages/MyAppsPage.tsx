@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
-import { AppWindow, ChevronRight, Loader2, Code, ArrowLeft, Home, Search } from 'lucide-react';
+import { AppWindow, Loader2, Search } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
+const CATEGORIES = ['All', 'Finacle', 'APT 2.0', 'Savings', 'PLI/RPLI', 'Business Developement', 'Others'];
 
 export default function MyAppsPage() {
   const [apps, setApps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
     async function fetchApps() {
@@ -26,49 +28,51 @@ export default function MyAppsPage() {
     fetchApps();
   }, []);
 
-  const filteredApps = apps.filter(app => 
-    app.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredApps = apps.filter(app => {
+    const matchesSearch = app.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const appCategory = app.category || 'Others';
+    const matchesCategory = selectedCategory === 'All' || appCategory === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col relative pb-24">
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 flex flex-col gap-3 z-50">
-        <button 
-          onClick={() => navigate(-1)}
-          className="w-12 h-12 bg-white rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-[#D8232A] hover:bg-gray-50 hover:scale-105 transition-all"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <Link 
-          to="/"
-          className="w-12 h-12 bg-[#D8232A] rounded-full shadow-lg flex items-center justify-center text-white hover:bg-[#8B0000] hover:scale-105 transition-all"
-        >
-          <Home size={20} />
-        </Link>
-      </div>
-      
-      <main className="flex-1 w-full pt-16 md:pt-24">
+    <div className="min-h-screen bg-white flex flex-col relative pb-24">
+      <main className="flex-1 w-full pt-12 md:pt-16">
         <section className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-[2rem] md:text-5xl font-black text-[#3b0909] flex items-center justify-center gap-3">
-              <AppWindow className="text-[#D8232A]" size={42} />
-              MY APPS
-            </h2>
-            <p className="text-slate-500 font-medium mt-4">Access all available tools and applications</p>
-          </div>
-
-          <div className="max-w-xl mx-auto mb-12">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
+            <div>
+              <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
+                Explore Apps
+              </h2>
+              <p className="text-slate-500 font-medium mt-2">Discover and launch web applications uploaded by the community.</p>
+            </div>
+            
+            <div className="w-full md:w-96 relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
-                placeholder="Search apps..."
+                placeholder="Search apps by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-red-200 focus:ring-4 focus:ring-red-50 text-gray-700 font-medium transition-all shadow-sm"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 focus:ring-2 focus:ring-gray-100 text-sm transition-all"
               />
             </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-10 border-b border-gray-100 pb-6">
+            {CATEGORIES.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`py-1.5 px-4 rounded-full text-xs font-medium transition-all ${
+                  selectedCategory === category
+                    ? 'bg-[#111827] text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
           </div>
           
           {loading ? (
@@ -76,51 +80,54 @@ export default function MyAppsPage() {
               <Loader2 className="animate-spin text-[#D8232A]" size={48} />
             </div>
           ) : apps.length === 0 ? (
-            <div className="text-center py-32 bg-white rounded-3xl border border-gray-100 shadow-sm mx-auto max-w-lg">
+            <div className="text-center py-32 bg-white rounded-[2rem] border border-gray-100 shadow-sm mx-auto max-w-lg">
               <AppWindow size={48} className="mx-auto text-gray-300 mb-4" />
               <h3 className="text-xl font-bold text-gray-400">No apps available</h3>
             </div>
           ) : filteredApps.length === 0 ? (
-            <div className="text-center py-32 bg-white rounded-3xl border border-gray-100 shadow-sm mx-auto max-w-lg">
+            <div className="text-center py-32 bg-white rounded-[2rem] border border-gray-100 shadow-sm mx-auto max-w-lg">
               <Search size={48} className="mx-auto text-gray-300 mb-4" />
               <h3 className="text-xl font-bold text-gray-400">No matching apps found</h3>
-              <p className="text-gray-400 mt-2">Try adjusting your search query</p>
+              <p className="text-gray-400 mt-2">Try adjusting your search query or category</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredApps.map((app, i) => {
                 const colors = [
-                  { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100/50', hoverBorder: 'hover:border-blue-200', hoverText: 'group-hover:text-blue-600' },
-                  { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100/50', hoverBorder: 'hover:border-emerald-200', hoverText: 'group-hover:text-emerald-600' },
-                  { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-100/50', hoverBorder: 'hover:border-purple-200', hoverText: 'group-hover:text-purple-600' },
-                  { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100/50', hoverBorder: 'hover:border-amber-200', hoverText: 'group-hover:text-amber-600' },
-                  { bg: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-100/50', hoverBorder: 'hover:border-rose-200', hoverText: 'group-hover:text-rose-600' },
-                  { bg: 'bg-cyan-50', text: 'text-cyan-600', border: 'border-cyan-100/50', hoverBorder: 'hover:border-cyan-200', hoverText: 'group-hover:text-cyan-600' },
+                  { bg: 'bg-[#eef2ff]', border: 'border-[#c7d2fe]' }, // Blueish
+                  { bg: 'bg-[#ecfdf5]', border: 'border-[#a7f3d0]' }, // Greenish
+                  { bg: 'bg-[#fffbeb]', border: 'border-[#fde68a]' }, // Yellowish
+                  { bg: 'bg-[#fdf2f8]', border: 'border-[#fbcfe8]' }, // Pinkish
+                  { bg: 'bg-[#f0fdf4]', border: 'border-[#bbf7d0]' }, // Pale green
+                  { bg: 'bg-[#faf5ff]', border: 'border-[#e9d5ff]' }, // Purplish
                 ];
                 const theme = colors[i % colors.length];
 
                 return (
                   <motion.div
                     key={app.id}
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.05, duration: 0.5 }}
+                    transition={{ delay: i * 0.05, duration: 0.4 }}
+                    className={`rounded-xl border ${theme.bg} ${theme.border} p-6 flex flex-col h-full hover:shadow-md transition-shadow`}
                   >
-                    <Link 
-                      to={`/my-apps/${app.id}`}
-                      className={`block bg-white rounded-[1.5rem] border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all group ${theme.hoverBorder}`}
-                    >
-                      <div className="h-44 flex items-center justify-center bg-white">
-                        <div className={`w-20 h-20 rounded-full ${theme.bg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm border ${theme.border}`}>
-                          <AppWindow size={32} className={theme.text} />
-                        </div>
-                      </div>
-                      <div className="bg-slate-50/80 border-t border-gray-100 p-5 flex items-center justify-between">
-                        <span className="font-bold text-[#1E293B] text-base truncate pr-4">{app.title}</span>
-                        <ChevronRight size={20} className={`text-[#94A3B8] transition-colors flex-shrink-0 ${theme.hoverText}`} />
-                      </div>
-                    </Link>
+                    <div className="flex justify-between items-start mb-16 gap-4">
+                      <h3 className="text-xl font-bold text-slate-900 tracking-tight leading-tight line-clamp-3">
+                        {app.title}
+                      </h3>
+                      <span className="bg-white border border-gray-200 text-slate-500 text-[10px] font-medium px-2 py-1 rounded shadow-sm whitespace-nowrap">
+                        {app.category || 'Others'}
+                      </span>
+                    </div>
+                    <div className="mt-auto">
+                      <Link 
+                        to={`/my-apps/${app.id}`}
+                        className="block w-full text-center bg-[#D8232A] hover:bg-[#B71C1C] text-white font-medium py-2.5 rounded shadow-sm transition-colors"
+                      >
+                        Launch App
+                      </Link>
+                    </div>
                   </motion.div>
                 );
               })}

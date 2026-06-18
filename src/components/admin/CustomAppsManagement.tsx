@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trash2, Edit, Save, X, Loader2, Code } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, X, Loader2, Code, Upload } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
 
 export function CustomAppsManagement() {
@@ -14,7 +14,10 @@ export function CustomAppsManagement() {
   // Form State
   const [title, setTitle] = useState('');
   const [htmlCode, setHtmlCode] = useState('');
+  const [category, setCategory] = useState('Others');
   const [saving, setSaving] = useState(false);
+
+  const APP_CATEGORIES = ['Finacle', 'APT 2.0', 'Savings', 'PLI/RPLI', 'Business Developement', 'Others'];
 
   useEffect(() => {
     fetchApps();
@@ -39,6 +42,7 @@ export function CustomAppsManagement() {
       const payload = {
         title,
         htmlCode,
+        category,
       };
 
       if (editingId) {
@@ -75,14 +79,40 @@ export function CustomAppsManagement() {
     setEditingId(app.id);
     setTitle(app.title);
     setHtmlCode(app.htmlCode);
+    setCategory(app.category || 'Others');
     setShowAdd(true);
   };
 
   const resetForm = () => {
     setTitle('');
     setHtmlCode('');
+    setCategory('Others');
     setEditingId(null);
     setShowAdd(false);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'text/html' && !file.name.endsWith('.html')) {
+      alert('Please upload a valid HTML file.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      setHtmlCode(content);
+      if (!title) {
+         // Optionally set title from filename without extension
+         setTitle(file.name.replace(/\.html$/, ''));
+      }
+    };
+    reader.onerror = () => {
+      alert('Error reading file. Please try again.');
+    };
+    reader.readAsText(file);
   };
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="animate-spin text-red-600" size={32} /></div>;
@@ -133,13 +163,44 @@ export function CustomAppsManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">HTML Code</label>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+                <select
+                  value={category}
+                  onChange={e => setCategory(e.target.value)}
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:border-red-500 transition-colors"
+                >
+                  {APP_CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-bold text-gray-700">HTML Code</label>
+                  <div>
+                    <input
+                      type="file"
+                      accept=".html"
+                      id="html-upload"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                    <label
+                      htmlFor="html-upload"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-bold cursor-pointer transition-colors"
+                    >
+                      <Upload size={14} />
+                      Upload HTML File
+                    </label>
+                  </div>
+                </div>
                 <textarea
                   required
                   value={htmlCode}
                   onChange={e => setHtmlCode(e.target.value)}
                   className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:border-red-500 transition-colors h-64 font-mono text-sm"
-                  placeholder="Paste your HTML code here..."
+                  placeholder="Paste your HTML code here or upload a file..."
                 />
               </div>
 
@@ -179,8 +240,12 @@ export function CustomAppsManagement() {
             
             <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">{app.title}</h3>
             
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 border-b pb-4">
-              {formatDate(app.createdAt)}
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+              {app.category || 'Others'}
+            </p>
+
+            <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-6 border-b pb-4">
+              Added: {formatDate(app.createdAt)}
             </p>
 
             <div className="flex items-center gap-2">
