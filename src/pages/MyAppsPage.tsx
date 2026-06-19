@@ -19,7 +19,7 @@ export default function MyAppsPage() {
         const q = query(collection(db, 'custom_apps'), orderBy('createdAt', 'desc'));
         const snap = await getDocs(q);
         
-        const fetchedApps = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const fetchedApps = snap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
         
         // Auto-migrate legacy categories to PLI/RPLI
         fetchedApps.forEach(async (app) => {

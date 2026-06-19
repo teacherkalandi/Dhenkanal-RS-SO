@@ -12,6 +12,7 @@ export default function CustomAppPage() {
   const [appData, setAppData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [iframeSrc, setIframeSrc] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     async function fetchApp() {
@@ -21,7 +22,13 @@ export default function CustomAppPage() {
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
-          setAppData({ id: docSnap.id, ...docSnap.data() });
+          const data = docSnap.data();
+          setAppData({ id: docSnap.id, ...data });
+          
+          if (data.htmlCode) {
+            const blob = new Blob([data.htmlCode], { type: 'text/html;charset=utf-8' });
+            setIframeSrc(URL.createObjectURL(blob));
+          }
         } else {
           setError('App not found');
         }
@@ -34,6 +41,14 @@ export default function CustomAppPage() {
     }
     fetchApp();
   }, [id]);
+
+  useEffect(() => {
+    return () => {
+      if (iframeSrc) {
+        URL.revokeObjectURL(iframeSrc);
+      }
+    };
+  }, [iframeSrc]);
 
   if (loading) {
     return (
@@ -72,8 +87,8 @@ export default function CustomAppPage() {
       >
         <iframe 
           title={appData.title}
-          srcDoc={appData.htmlCode}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          src={iframeSrc}
+          sandbox="allow-downloads allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
           className="flex-1 w-full h-full border-none"
           style={{ minHeight: 'calc(100vh - 73px)' }}
         />
