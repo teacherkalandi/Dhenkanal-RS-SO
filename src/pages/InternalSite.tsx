@@ -90,7 +90,7 @@ const OFFICIAL_LINKS = [
   },
   {
     name: 'Finacle Assistant',
-    url: 'https://finacle-assistant.vercel.app/',
+    url: 'https://finacle-user-guide.vercel.app/',
     description: 'Assistant for managing Finacle core banking operations and queries.',
     icon: Bot,
     color: 'bg-cyan-50 border-cyan-100 hover:border-cyan-300 text-cyan-900',
