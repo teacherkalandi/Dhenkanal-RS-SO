@@ -107,6 +107,31 @@ const DocIcon = ({ type, colorClass }: { type: string; colorClass: string }) => 
   );
 };
 
+const getFileTypeLabel = (doc: Document) => {
+  const url = doc.fileUrl || doc.externalLink;
+  if (!url) return "Official document";
+  
+  const lowerUrl = url.toLowerCase();
+  
+  if (lowerUrl.includes('drive.google.com') || lowerUrl.includes('docs.google.com')) {
+    if (lowerUrl.includes('/document/')) return "Google Doc";
+    if (lowerUrl.includes('/spreadsheets/')) return "Google Sheet";
+    if (lowerUrl.includes('/presentation/')) return "Google Slide";
+    if (lowerUrl.includes('/forms/')) return "Google Form";
+    return "Google Drive File";
+  }
+  
+  if (lowerUrl.endsWith('.pdf') || lowerUrl.includes('.pdf?')) return "PDF Document";
+  if (lowerUrl.endsWith('.doc') || lowerUrl.endsWith('.docx') || lowerUrl.includes('.doc?') || lowerUrl.includes('.docx?')) return "Word Document";
+  if (lowerUrl.endsWith('.xls') || lowerUrl.endsWith('.xlsx') || lowerUrl.includes('.xls?') || lowerUrl.includes('.xlsx?')) return "Excel Document";
+  if (lowerUrl.endsWith('.ppt') || lowerUrl.endsWith('.pptx') || lowerUrl.includes('.ppt?') || lowerUrl.includes('.pptx?')) return "PowerPoint Presentation";
+  if (lowerUrl.endsWith('.zip') || lowerUrl.endsWith('.rar') || lowerUrl.includes('.zip?') || lowerUrl.includes('.rar?')) return "Archive File";
+  if (lowerUrl.endsWith('.jpg') || lowerUrl.endsWith('.jpeg') || lowerUrl.endsWith('.png') || lowerUrl.includes('.jpg?') || lowerUrl.includes('.png?')) return "Image File";
+  if (lowerUrl.endsWith('.mp4') || lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return "Video File";
+  
+  return "Official document";
+};
+
 export default function CategoryPage() {
   const { categoryId } = useParams();
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -317,7 +342,7 @@ export default function CategoryPage() {
                                   {doc.title}
                                 </h4>
                                 <p className="text-[11px] md:text-sm text-white/90 line-clamp-1 md:line-clamp-2 leading-relaxed">
-                                  {doc.description || "Official document"}
+                                  {getFileTypeLabel(doc)}{doc.description ? ` • ${doc.description}` : ''}
                                 </p>
                               </div>
                             </div>

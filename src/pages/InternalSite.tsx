@@ -124,6 +124,15 @@ const OFFICIAL_LINKS = [
     iconBg: 'bg-fuchsia-600 text-white',
     themeColor: '#c026d3',
   },
+  {
+    name: 'Multi Receipt',
+    url: 'https://multi-receipt.vercel.app/',
+    description: 'Generate multiple receipts efficiently.',
+    icon: Receipt,
+    color: 'bg-orange-50 border-orange-100 hover:border-orange-300 text-orange-900',
+    iconBg: 'bg-orange-600 text-white',
+    themeColor: '#ea580c',
+  },
 ];
 
 export default function InternalSite() {
