@@ -8,6 +8,7 @@ import { db } from '../../lib/firebase';
 const SHORTCUTS = [
   { name: 'Track Consignment', icon: Search, url: 'https://www.indiapost.gov.in/', color: 'text-ip-red' },
   { name: 'Calculate Postage', icon: Calculator, url: 'https://www.indiapost.gov.in/calculate-postage', color: 'text-blue-600' },
+  { name: 'Tariff Calculator', icon: Calculator, url: 'https://tariff-calculator-nu.vercel.app/', color: 'text-rose-600' },
   { name: 'Savings Schemes', icon: PiggyBank, url: 'https://www.indiapost.gov.in/banking-services/savings', color: 'text-pink-600' },
   { name: 'Interest Rates', icon: Percent, url: 'https://interest-rates-nine.vercel.app/', color: 'text-teal-600' },
   { name: 'Internet Banking', icon: Landmark, url: 'https://ebanking.indiapost.gov.in/corp/AuthenticationController?FORMSGROUP_ID__=AuthenticationFG&__START_TRAN_FLAG__=Y&__FG_BUTTONS__=LOAD&ACTION.LOAD=Y&AuthenticationFG.LOGIN_FLAG=1&BANK_ID=DOP', color: 'text-amber-600' },
