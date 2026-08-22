@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { auth, signInWithGoogle, db } from '../lib/firebase';
+import React, { useState, useEffect, useRef } from 'react';
+import { auth, signInWithGoogle, db, getAccessToken, initAuth } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
 import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Bell, Image as ImageIcon, Code } from 'lucide-react';
@@ -342,9 +342,12 @@ function DocumentManagement() {
   const [docs, setDocs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [fileToUpload, setFileToUpload] = useState<File | null>(null);
   const [form, setForm] = useState({
     title: '', category: CATEGORIES[0], subCategory: '', description: '', fileUrl: '', externalLink: ''
   });
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchDocs();
@@ -356,19 +359,86 @@ function DocumentManagement() {
     setDocs(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFileToUpload(e.target.files[0]);
+    }
+  };
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      let finalFileUrl = form.fileUrl;
+      
+      if (fileToUpload) {
+        const accessToken = await getAccessToken();
+        if (!accessToken) {
+          throw new Error('Please sign in to upload files to Google Drive');
+        }
+
+        const metadata = {
+          name: fileToUpload.name,
+          parents: ['12n_G6cD8Ps-N2DvPm45HI17PhYmNYsOl']
+        };
+
+        const uploadForm = new FormData();
+        uploadForm.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        uploadForm.append('file', fileToUpload);
+
+        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: uploadForm
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => null);
+          console.error('Upload failed:', errData);
+          throw new Error('Failed to upload file to Google Drive');
+        }
+
+        const data = await response.json();
+        
+        // Give anyone with the link view access
+        await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}/permissions`, {
+           method: 'POST',
+           headers: {
+             Authorization: `Bearer ${accessToken}`,
+             'Content-Type': 'application/json',
+           },
+           body: JSON.stringify({
+             role: 'reader',
+             type: 'anyone',
+           })
+        });
+
+        // Get the webViewLink for the user to view
+        const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}?fields=webViewLink`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        });
+        const fileData = await fileRes.json();
+        finalFileUrl = fileData.webViewLink;
+      }
+
       await addDoc(collection(db, 'documents'), {
         ...form,
+        fileUrl: finalFileUrl,
         category: form.category.toLowerCase().replace(/[\/\s]/g, '-'),
         createdAt: serverTimestamp(),
         authorUid: auth.currentUser?.uid
       });
       setShowAdd(false);
       setForm({ title: '', category: CATEGORIES[0], subCategory: '', description: '', fileUrl: '', externalLink: '' });
+      setFileToUpload(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       fetchDocs();
+    } catch (error: any) {
+      alert(error.message || 'An error occurred during upload.');
     } finally {
       setLoading(false);
     }
@@ -454,20 +524,17 @@ function DocumentManagement() {
                  </div>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-gray-100">
                     <div className="flex flex-col justify-center">
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Drive Repository</p>
-                      <a 
-                        href="https://drive.google.com/drive/folders/12n_G6cD8Ps-N2DvPm45HI17PhYmNYsOl?usp=sharing" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-1"
-                      >
-                        <ExternalLink size={12} />
-                        Open Official G-Drive Folder
-                      </a>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Upload directly to Drive</p>
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        onChange={handleFileSelect} 
+                        className="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
+                      />
                     </div>
                     <div className="bg-blue-50 p-3 rounded-xl">
                       <p className="text-[9px] text-blue-800 leading-tight">
-                        <strong>Tip:</strong> Upload your file to the correct category subfolder in Drive first, then copy the "Share Link" and paste it below.
+                        <strong>New!</strong> You can now select a file to upload directly to the Official G-Drive Folder. The link will be generated automatically.
                       </p>
                     </div>
                  </div>
@@ -478,7 +545,7 @@ function DocumentManagement() {
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">G-Drive File Link</label>
-                      <input required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.fileUrl} onChange={e => setForm({...form, fileUrl: e.target.value})} placeholder="https://drive.google.com/..." />
+                      <input disabled={!!fileToUpload} required={!fileToUpload} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" value={form.fileUrl} onChange={e => setForm({...form, fileUrl: e.target.value})} placeholder={fileToUpload ? 'Auto-generated on upload' : 'https://drive.google.com/...'} />
                     </div>
                  </div>
                  <button disabled={loading} className="w-full bg-[#D8232A] text-white py-4 rounded-2xl font-bold uppercase tracking-widest mt-6 shadow-xl shadow-red-500/20">
