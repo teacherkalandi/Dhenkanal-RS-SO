@@ -71,6 +71,15 @@ const OFFICIAL_LINKS = [
     themeColor: '#d946ef',
   },
   {
+    name: 'Cash Dashboard',
+    url: 'https://cash-dashboard-lemon.vercel.app/',
+    description: 'Track and manage cash operations across post office branches.',
+    icon: Receipt,
+    color: 'bg-green-50 border-green-100 hover:border-green-300 text-green-900',
+    iconBg: 'bg-green-500 text-white',
+    themeColor: '#22c55e',
+  },
+  {
     name: 'Circulars Portal',
     url: 'https://circulars.vercel.app/',
     description: 'Access the central storage for published department circulars and policy guidelines.',
