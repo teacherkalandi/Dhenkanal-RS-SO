@@ -7,7 +7,7 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('https://www.googleapis.com/auth/drive.file');
+googleProvider.addScope('https://www.googleapis.com/auth/drive');
 
 // Flag to indicate if we are in the middle of a sign-in flow.
 let isSigningIn = false;
@@ -56,6 +56,13 @@ export const signInWithGoogle = async () => {
 
 export const getAccessToken = async (): Promise<string | null> => {
   return cachedAccessToken;
+};
+
+export const getOrRequestAccessToken = async (): Promise<string | null> => {
+  if (cachedAccessToken) return cachedAccessToken;
+  // If not cached, request it by triggering popup again
+  const result = await signInWithGoogle();
+  return result?.accessToken || null;
 };
 
 export const logout = async () => {

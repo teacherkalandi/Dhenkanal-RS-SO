@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { auth, signInWithGoogle, db, getAccessToken, initAuth } from '../lib/firebase';
+import { auth, signInWithGoogle, db, getOrRequestAccessToken, initAuth } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
 import { LayoutDashboard, LogIn, LogOut, FilePlus, Megaphone, ClipboardList, ShieldCheck, User, Trash2, Edit, Search, Plus, Filter, Loader2, Save, X, Eye, FileDown, FileText, ExternalLink, Bell, Image as ImageIcon, Code } from 'lucide-react';
@@ -372,7 +372,7 @@ function DocumentManagement() {
       let finalFileUrl = form.fileUrl;
       
       if (fileToUpload) {
-        const accessToken = await getAccessToken();
+        const accessToken = await getOrRequestAccessToken();
         if (!accessToken) {
           throw new Error('Please sign in to upload files to Google Drive');
         }
@@ -426,11 +426,14 @@ function DocumentManagement() {
       }
 
       await addDoc(collection(db, 'documents'), {
-        ...form,
-        fileUrl: finalFileUrl,
+        title: form.title || '',
+        description: form.description || '',
+        subCategory: form.subCategory || '',
+        externalLink: form.externalLink || '',
+        fileUrl: finalFileUrl || '',
         category: form.category.toLowerCase().replace(/[\/\s]/g, '-'),
         createdAt: serverTimestamp(),
-        authorUid: auth.currentUser?.uid
+        authorUid: auth.currentUser?.uid || 'admin'
       });
       setShowAdd(false);
       setForm({ title: '', category: CATEGORIES[0], subCategory: '', description: '', fileUrl: '', externalLink: '' });
