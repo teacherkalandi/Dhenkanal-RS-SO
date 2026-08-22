@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CategoryCards from '../components/home/CategoryCards';
 import { motion, AnimatePresence } from 'motion/react';
-import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot, Building2, Receipt, AppWindow, LayoutDashboard } from 'lucide-react';
+import { Ticket, Hammer, Cpu, PiggyBank, Mail, ExternalLink, QrCode, X, Copy, Check, Download, Loader2, Calendar, Image as ImageIcon, ZoomIn, FileCheck, Bot, Building2, Receipt, AppWindow, LayoutDashboard, Lock } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { db } from '../lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -145,8 +145,30 @@ const OFFICIAL_LINKS = [
 ];
 
 export default function InternalSite() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  
   const [selectedLinkForQR, setSelectedLinkForQR] = React.useState<typeof OFFICIAL_LINKS[number] | null>(null);
   const [copied, setCopied] = React.useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem('internalSiteAuth') === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (userId === '10166284' && password === 'Dop@1234') {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('internalSiteAuth', 'true');
+      setError('');
+    } else {
+      setError('Invalid User ID or Password');
+    }
+  };
 
   const downloadSVG = (link: typeof OFFICIAL_LINKS[number]) => {
     const svgId = `qr-code-svg-${link.name.toLowerCase().replace(/[\/\s]/g, '-')}`;
@@ -171,6 +193,67 @@ export default function InternalSite() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 px-4">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white max-w-md w-full p-8 md:p-10 rounded-3xl md:rounded-[2.5rem] shadow-xl border border-slate-100 text-center"
+        >
+          <div className="w-16 h-16 bg-red-50 text-[#D8232A] rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Lock size={32} />
+          </div>
+          <h2 className="text-2xl font-black uppercase text-[#8B0000] mb-2 tracking-tight">Internal Portal</h2>
+          <p className="text-sm text-slate-500 mb-8 font-medium">Please enter your authorized credentials to access internal systems.</p>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <input
+                type="text"
+                placeholder="User ID"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 px-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-medium text-slate-700 text-sm"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 px-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-medium text-slate-700 text-sm"
+                required
+              />
+            </div>
+            
+            <AnimatePresence>
+              {error && (
+                <motion.p 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="text-red-500 text-xs font-bold uppercase tracking-wide text-left"
+                >
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            <button 
+              type="submit"
+              className="w-full bg-[#D8232A] text-white font-bold py-4 rounded-2xl hover:bg-[#8B0000] transition-colors shadow-lg shadow-red-900/20 uppercase tracking-widest text-xs mt-4 flex items-center justify-center gap-2"
+            >
+              Sign In
+            </button>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
