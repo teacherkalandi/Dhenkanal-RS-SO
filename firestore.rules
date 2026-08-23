@@ -100,7 +100,9 @@ service cloud.firestore {
 
     function isValidCustomApp(data) {
       return data.title is string
-          && data.htmlCode is string;
+          && (data.get('htmlCode', '') is string)
+          && (data.get('linkUrl', '') is string)
+          && (data.get('category', '') is string);
     }
 
     // --- COLLECTION RULES ---

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
-import { AppWindow, Loader2, Search } from 'lucide-react';
+import { AppWindow, Loader2, Search, LayoutDashboard, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 
@@ -107,16 +107,17 @@ export default function MyAppsPage() {
               <p className="text-gray-400 mt-2">Try adjusting your search query or category</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredApps.map((app, i) => {
                 const colors = [
-                  { bg: 'bg-[#eef2ff]', border: 'border-[#c7d2fe]' }, // Blueish
-                  { bg: 'bg-[#ecfdf5]', border: 'border-[#a7f3d0]' }, // Greenish
-                  { bg: 'bg-[#fffbeb]', border: 'border-[#fde68a]' }, // Yellowish
-                  { bg: 'bg-[#fdf2f8]', border: 'border-[#fbcfe8]' }, // Pinkish
-                  { bg: 'bg-[#f0fdf4]', border: 'border-[#bbf7d0]' }, // Pale green
-                  { bg: 'bg-[#faf5ff]', border: 'border-[#e9d5ff]' }, // Purplish
+                  { left: 'bg-[#C62828]', right: 'bg-[#D32F2F]' }, // Red
+                  { left: 'bg-[#00695C]', right: 'bg-[#00796B]' }, // Teal
+                  { left: 'bg-[#4527A0]', right: 'bg-[#512DA8]' }, // Purple
+                  { left: 'bg-[#1565C0]', right: 'bg-[#1976D2]' }, // Blue
+                  { left: 'bg-[#E65100]', right: 'bg-[#EF6C00]' }, // Orange
+                  { left: 'bg-[#00838F]', right: 'bg-[#0097A7]' }, // Cyan
                 ];
+                
                 const theme = colors[i % colors.length];
 
                 return (
@@ -126,24 +127,30 @@ export default function MyAppsPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.05, duration: 0.4 }}
-                    className={`rounded-xl border ${theme.bg} ${theme.border} p-6 flex flex-col h-full hover:shadow-md transition-shadow`}
                   >
-                    <div className="flex justify-between items-start mb-16 gap-4">
-                      <h3 className="text-xl font-bold text-slate-900 tracking-tight leading-tight line-clamp-3">
-                        {app.title}
-                      </h3>
-                      <span className="bg-white border border-gray-200 text-slate-500 text-[10px] font-medium px-2 py-1 rounded shadow-sm whitespace-nowrap">
-                        {app.category || 'Others'}
-                      </span>
-                    </div>
-                    <div className="mt-auto">
-                      <Link 
-                        to={`/my-apps/${app.id}`}
-                        className="block w-full text-center bg-[#D8232A] hover:bg-[#B71C1C] text-white font-medium py-2.5 rounded shadow-sm transition-colors"
-                      >
-                        Launch App
-                      </Link>
-                    </div>
+                    <Link 
+                      to={`/my-apps/${app.id}`}
+                      className="group flex flex-row items-stretch rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 h-[100px] md:h-[110px]"
+                    >
+                      {/* Left Side Icon Area */}
+                      <div className={`${theme.left} w-24 md:w-28 flex-shrink-0 flex items-center justify-center transition-colors`}>
+                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-800 shadow-sm group-hover:scale-110 transition-transform">
+                          <LayoutDashboard size={22} strokeWidth={2.5} />
+                        </div>
+                      </div>
+                      
+                      {/* Right Side Content Area */}
+                      <div className={`${theme.right} flex-1 flex flex-col justify-center px-5 relative transition-colors`}>
+                        <h3 className="text-white font-bold text-sm md:text-base pr-6 line-clamp-2 leading-tight">
+                          {app.title}
+                        </h3>
+                        <p className="text-white/80 text-[9px] md:text-[10px] font-bold uppercase tracking-wider mt-1.5">
+                          1 ITEMS IN CATEGORY
+                        </p>
+                        
+                        <ChevronRight size={18} className="absolute right-4 text-white/40 group-hover:text-white transition-colors" />
+                      </div>
+                    </Link>
                   </motion.div>
                 );
               })}

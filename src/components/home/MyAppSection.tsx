@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
-import { Code } from 'lucide-react';
+import { LayoutDashboard, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 
@@ -33,16 +33,17 @@ export default function MyAppSection() {
         </div>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {apps.map((app, i) => {
           const colors = [
-            { bg: 'bg-blue-500', shadow: 'shadow-blue-500/20', hoverBorder: 'hover:border-blue-200', overlay: 'bg-blue-50/10' },
-            { bg: 'bg-emerald-500', shadow: 'shadow-emerald-500/20', hoverBorder: 'hover:border-emerald-200', overlay: 'bg-emerald-50/10' },
-            { bg: 'bg-purple-500', shadow: 'shadow-purple-500/20', hoverBorder: 'hover:border-purple-200', overlay: 'bg-purple-50/10' },
-            { bg: 'bg-amber-500', shadow: 'shadow-amber-500/20', hoverBorder: 'hover:border-amber-200', overlay: 'bg-amber-50/10' },
-            { bg: 'bg-rose-500', shadow: 'shadow-rose-500/20', hoverBorder: 'hover:border-rose-200', overlay: 'bg-rose-50/10' },
-            { bg: 'bg-cyan-500', shadow: 'shadow-cyan-500/20', hoverBorder: 'hover:border-cyan-200', overlay: 'bg-cyan-50/10' },
+            { left: 'bg-[#C62828]', right: 'bg-[#D32F2F]' }, // Red
+            { left: 'bg-[#00695C]', right: 'bg-[#00796B]' }, // Teal
+            { left: 'bg-[#4527A0]', right: 'bg-[#512DA8]' }, // Purple
+            { left: 'bg-[#1565C0]', right: 'bg-[#1976D2]' }, // Blue
+            { left: 'bg-[#E65100]', right: 'bg-[#EF6C00]' }, // Orange
+            { left: 'bg-[#00838F]', right: 'bg-[#0097A7]' }, // Cyan
           ];
+          
           const theme = colors[i % colors.length];
 
           return (
@@ -51,18 +52,30 @@ export default function MyAppSection() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.05, duration: 0.5 }}
+              transition={{ delay: i * 0.05, duration: 0.4 }}
             >
               <Link 
                 to={`/my-apps/${app.id}`}
-                className={`group bg-white border border-gray-100 h-44 md:h-52 rounded-3xl p-6 flex flex-col items-center justify-center text-center transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:-translate-y-2 ${theme.hoverBorder} relative overflow-hidden`}
+                className="group flex flex-row items-stretch rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 h-[100px] md:h-[110px]"
               >
-                <div className={`${theme.bg} p-4 rounded-2xl text-white mb-4 group-hover:scale-110 transition-transform shadow-lg ${theme.shadow}`}>
-                  <Code size={24} />
+                {/* Left Side Icon Area */}
+                <div className={`${theme.left} w-24 md:w-28 flex-shrink-0 flex items-center justify-center transition-colors`}>
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-800 shadow-sm group-hover:scale-110 transition-transform">
+                    <LayoutDashboard size={22} strokeWidth={2.5} />
+                  </div>
                 </div>
-                <span className="font-black text-[13px] text-slate-700 uppercase tracking-tight leading-snug">{app.title}</span>
                 
-                <div className={`absolute inset-0 ${theme.overlay} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />
+                {/* Right Side Content Area */}
+                <div className={`${theme.right} flex-1 flex flex-col justify-center px-5 relative transition-colors`}>
+                  <h3 className="text-white font-bold text-sm md:text-base pr-6 line-clamp-2 leading-tight">
+                    {app.title}
+                  </h3>
+                  <p className="text-white/80 text-[9px] md:text-[10px] font-bold uppercase tracking-wider mt-1.5">
+                    1 ITEMS IN CATEGORY
+                  </p>
+                  
+                  <ChevronRight size={18} className="absolute right-4 text-white/40 group-hover:text-white transition-colors" />
+                </div>
               </Link>
             </motion.div>
           );

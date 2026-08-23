@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trash2, Edit, Save, X, Loader2, Code, Upload } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, X, Loader2, Code, Upload, Link as LinkIcon, FileCode } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
 
 export function CustomAppsManagement() {
@@ -13,7 +13,9 @@ export function CustomAppsManagement() {
 
   // Form State
   const [title, setTitle] = useState('');
+  const [sourceType, setSourceType] = useState<'code' | 'link'>('code');
   const [htmlCode, setHtmlCode] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
   const [category, setCategory] = useState('Others');
   const [saving, setSaving] = useState(false);
 
@@ -41,7 +43,8 @@ export function CustomAppsManagement() {
     try {
       const payload = {
         title,
-        htmlCode,
+        htmlCode: sourceType === 'code' ? htmlCode : '',
+        linkUrl: sourceType === 'link' ? linkUrl : '',
         category,
       };
 
@@ -78,7 +81,9 @@ export function CustomAppsManagement() {
   const editApp = (app: any) => {
     setEditingId(app.id);
     setTitle(app.title);
-    setHtmlCode(app.htmlCode);
+    setHtmlCode(app.htmlCode || '');
+    setLinkUrl(app.linkUrl || '');
+    setSourceType(app.linkUrl ? 'link' : 'code');
     setCategory(app.category || 'Others');
     setShowAdd(true);
   };
@@ -86,6 +91,8 @@ export function CustomAppsManagement() {
   const resetForm = () => {
     setTitle('');
     setHtmlCode('');
+    setLinkUrl('');
+    setSourceType('code');
     setCategory('Others');
     setEditingId(null);
     setShowAdd(false);
@@ -95,18 +102,13 @@ export function CustomAppsManagement() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.type !== 'text/html' && !file.name.endsWith('.html')) {
-      alert('Please upload a valid HTML file.');
-      return;
-    }
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
       setHtmlCode(content);
       if (!title) {
          // Optionally set title from filename without extension
-         setTitle(file.name.replace(/\.html$/, ''));
+         setTitle(file.name.replace(/\.[^/.]+$/, ''));
       }
     };
     reader.onerror = () => {
@@ -176,33 +178,71 @@ export function CustomAppsManagement() {
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-bold text-gray-700">HTML Code</label>
-                  <div>
-                    <input
-                      type="file"
-                      accept=".html"
-                      id="html-upload"
-                      className="hidden"
-                      onChange={handleFileUpload}
+                <label className="block text-sm font-bold text-gray-700 mb-2">App Source</label>
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      checked={sourceType === 'code'} 
+                      onChange={() => setSourceType('code')}
+                      className="text-red-600 focus:ring-red-500"
                     />
-                    <label
-                      htmlFor="html-upload"
-                      className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-bold cursor-pointer transition-colors"
-                    >
-                      <Upload size={14} />
-                      Upload HTML File
-                    </label>
-                  </div>
+                    <span className="text-sm font-bold text-gray-700 flex items-center gap-1"><FileCode size={16} /> Code/File</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      checked={sourceType === 'link'} 
+                      onChange={() => setSourceType('link')}
+                      className="text-red-600 focus:ring-red-500"
+                    />
+                    <span className="text-sm font-bold text-gray-700 flex items-center gap-1"><LinkIcon size={16} /> Website Link</span>
+                  </label>
                 </div>
-                <textarea
-                  required
-                  value={htmlCode}
-                  onChange={e => setHtmlCode(e.target.value)}
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:border-red-500 transition-colors h-64 font-mono text-sm"
-                  placeholder="Paste your HTML code here or upload a file..."
-                />
               </div>
+
+              {sourceType === 'code' ? (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-bold text-gray-700">Code Snippet</label>
+                    <div>
+                      <input
+                        type="file"
+                        accept=".html,.js,.jsx,.tsx,.ts,.css,.json,.txt"
+                        id="html-upload"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                      />
+                      <label
+                        htmlFor="html-upload"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-bold cursor-pointer transition-colors"
+                      >
+                        <Upload size={14} />
+                        Upload File
+                      </label>
+                    </div>
+                  </div>
+                  <textarea
+                    required
+                    value={htmlCode}
+                    onChange={e => setHtmlCode(e.target.value)}
+                    className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:border-red-500 transition-colors h-64 font-mono text-sm"
+                    placeholder="Paste your code here or upload a file..."
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Website URL</label>
+                  <input
+                    type="url"
+                    required
+                    value={linkUrl}
+                    onChange={e => setLinkUrl(e.target.value)}
+                    className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:border-red-500 transition-colors"
+                    placeholder="https://example.com"
+                  />
+                </div>
+              )}
 
               <div className="flex justify-end gap-3 pt-4 border-t">
                 <button

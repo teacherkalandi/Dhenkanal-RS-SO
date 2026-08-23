@@ -25,7 +25,9 @@ export default function CustomAppPage() {
           const data = docSnap.data();
           setAppData({ id: docSnap.id, ...data });
           
-          if (data.htmlCode) {
+          if (data.linkUrl) {
+            setIframeSrc(data.linkUrl);
+          } else if (data.htmlCode) {
             const blob = new Blob([data.htmlCode], { type: 'text/html;charset=utf-8' });
             setIframeSrc(URL.createObjectURL(blob));
           }
