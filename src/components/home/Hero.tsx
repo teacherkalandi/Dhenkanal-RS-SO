@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { db } from '../../lib/firebase';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 
@@ -118,12 +119,12 @@ export default function Hero() {
                 {slides[current]?.subtitle}
               </p>
               <div className="flex gap-4">
-                <button 
-                  onClick={() => document.getElementById('service-request')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-ip-red hover:bg-red-600 px-10 py-4 rounded-lg text-[11px] font-black text-white uppercase tracking-[0.2em] transition-all shadow-2xl hover:scale-105 active:scale-95"
+                <Link 
+                  to="/services"
+                  className="bg-ip-red hover:bg-red-600 px-10 py-4 rounded-lg text-[11px] font-black text-white uppercase tracking-[0.2em] transition-all shadow-2xl hover:scale-105 active:scale-95 inline-flex items-center"
                 >
                   Explore Services
-                </button>
+                </Link>
                 <a 
                   href="https://www.indiapost.gov.in/banking-services/savings"
                   target="_blank"

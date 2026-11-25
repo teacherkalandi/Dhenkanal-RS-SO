@@ -65,35 +65,35 @@ export default function ServiceRequest({ hideHeader = false }: { hideHeader?: bo
   };
 
   return (
-    <div className={hideHeader ? "" : "max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 pb-32 md:pb-20"}>
+    <div className={hideHeader ? "" : "max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-14 pb-28 md:pb-16"}>
       {!hideHeader && (
-        <div className="text-center mb-10 md:mb-16">
-          <div className="flex flex-col items-center gap-4 mb-4">
+        <div className="text-center mb-8 md:mb-12">
+          <div className="flex flex-col items-center gap-3 mb-3">
             <div className="section-heading-line" />
-            <h2 className="text-2xl md:text-4xl font-black text-slate-800 uppercase tracking-tighter">Service Request Portal</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-800 uppercase tracking-tighter">Service Request Portal</h2>
           </div>
-          <p className="text-slate-500 max-w-xl mx-auto font-medium text-xs md:text-base leading-relaxed">
+          <p className="text-slate-500 max-w-xl mx-auto font-medium text-xs md:text-sm leading-relaxed">
             Select a citizen-centric service below to initiate a request. Our dedicated postal staff will process your application promptly.
           </p>
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         {SERVICES.map((service) => (
           <motion.button
             key={service.id}
-            whileHover={{ y: -8, shadow: "0 20px 40px -12px rgba(0,0,0,0.12)" }}
+            whileHover={{ y: -4, boxShadow: "0 12px 24px -8px rgba(0,0,0,0.1)" }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setSelectedService(service)}
-            className="flex flex-col items-center p-6 md:p-10 bg-white rounded-3xl md:rounded-[2.5rem] shadow-sm border border-slate-100 hover:border-ip-red transition-all group"
+            className="flex flex-col items-center p-4 md:p-5 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-ip-red transition-all group cursor-pointer"
           >
-            <div className="w-12 h-12 md:w-24 md:h-24 bg-slate-50 rounded-2xl md:rounded-3xl flex items-center justify-center text-ip-maroon mb-4 md:mb-8 group-hover:bg-ip-red group-hover:text-white transition-all shadow-sm">
-              <service.icon size={24} className="md:w-[44px] md:h-[44px]" />
+            <div className="w-11 h-11 md:w-14 md:h-14 bg-slate-50 rounded-xl flex items-center justify-center text-ip-maroon mb-3 md:mb-4 group-hover:bg-ip-red group-hover:text-white transition-all shadow-sm">
+              <service.icon size={20} className="md:w-6 md:h-6" />
             </div>
-            <h3 className="font-black text-center text-slate-800 uppercase tracking-tight text-[10px] md:text-sm leading-tight flex-grow notranslate">{service.name}</h3>
-            <div className="mt-4 md:mt-6 flex items-center gap-2 md:gap-3 text-[8px] md:text-[11px] font-black text-ip-red uppercase tracking-widest border-t border-slate-50 pt-3 md:pt-4 w-full justify-center">
+            <h3 className="font-black text-center text-slate-800 uppercase tracking-tight text-[11px] md:text-xs leading-snug flex-grow notranslate">{service.name}</h3>
+            <div className="mt-3 pt-2.5 flex items-center gap-1.5 text-[9px] md:text-[10px] font-black text-ip-red uppercase tracking-widest border-t border-slate-100 w-full justify-center">
               <span>Request</span>
-              <Send size={10} className="md:w-[14px] md:h-[14px] group-hover:translate-x-1 transition-transform" />
+              <Send size={10} className="md:w-3 md:h-3 group-hover:translate-x-1 transition-transform" />
             </div>
           </motion.button>
         ))}
